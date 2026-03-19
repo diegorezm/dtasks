@@ -54,3 +54,22 @@ bun run destroy      # tear down Cloudflare resources
 - Env vars are validated in `@dtask/env` and imported across apps
 - Cloudflare bindings (DB, CORS_ORIGIN, etc.) are wired in `packages/infra/alchemy.run.ts`
 - Code style enforced with Biome (`bun run check`)
+
+## Git conventions
+
+Always use conventional commits:
+
+- `feat:` new feature
+- `fix:` bug fix
+- `refactor:` code change that is not a fix or feature
+- `chore:` tooling, config, dependencies
+- `docs:` documentation only
+- `style:` formatting, no logic change
+- `test:` adding or updating tests
+
+Example: `feat: add auth login endpoint`
+
+## TypeScript rules
+
+- **Never use `any`** unless explicitly told to by the user
+- **Never use `as`** for type casting unless there is absolutely no alternative — always prefer proper typing, type guards, or inference
