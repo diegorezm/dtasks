@@ -34,6 +34,7 @@
     "dev:server": "turbo -F server dev",
     "db:push": "turbo -F @dtask/db db:push",
     "db:generate": "turbo -F @dtask/db db:generate",
+    "ui:add": "bunx shadcn@latest add --cwd packages/ui",
     "deploy": "turbo -F @dtask/infra deploy",
     "destroy": "turbo -F @dtask/infra destroy",
     "check": "biome check --write ."
