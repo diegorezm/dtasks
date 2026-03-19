@@ -1,0 +1,3 @@
+{
+  "extends": "@dtask/config/tsconfig.base.json"
+}
