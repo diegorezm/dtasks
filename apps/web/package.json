@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "@dtask/web",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@dtask/env": "workspace:*",
+    "@dtask/server": "workspace:*",
     "@dtask/ui": "workspace:*",
     "@libsql/client": "catalog:",
     "@tailwindcss/vite": "^4.1.18",
@@ -18,6 +19,7 @@
     "@tanstack/react-start": "^1.141.1",
     "@tanstack/router-plugin": "^1.141.1",
     "dotenv": "catalog:",
+    "hono": "^4.12.8",
     "libsql": "catalog:",
     "lucide-react": "catalog:",
     "next-themes": "catalog:",

@@ -1,17 +1,23 @@
 import alchemy from "alchemy";
-import { TanStackStart } from "alchemy/cloudflare";
-import { Worker } from "alchemy/cloudflare";
-import { D1Database } from "alchemy/cloudflare";
+import { D1Database, TanStackStart, Worker } from "alchemy/cloudflare";
 import { config } from "dotenv";
 
 config({ path: "./.env" });
 config({ path: "../../apps/web/.env" });
 config({ path: "../../apps/server/.env" });
 
-const app = await alchemy("dtask");
+const stage = process.env.STAGE || "dev";
+const app = await alchemy("dtask", { stage });
+const isProd = app.stage === "prod";
 
 const db = await D1Database("database", {
   migrationsDir: "../../packages/db/src/migrations",
+  dev: !isProd
+    ? {
+      remote: false,
+      force: true,
+    }
+    : undefined,
 });
 
 export const web = await TanStackStart("web", {

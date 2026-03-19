@@ -54,8 +54,3 @@ bun run destroy      # tear down Cloudflare resources
 - Env vars are validated in `@dtask/env` and imported across apps
 - Cloudflare bindings (DB, CORS_ORIGIN, etc.) are wired in `packages/infra/alchemy.run.ts`
 - Code style enforced with Biome (`bun run check`)
-
-## TypeScript rules
-
-- **Never use `any`** unless explicitly told to by the user
-- **Never use `as`** for type casting unless there is absolutely no alternative — always prefer proper typing, type guards, or inference
