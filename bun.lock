@@ -50,6 +50,7 @@
       "name": "@dtask/web",
       "dependencies": {
         "@dtask/env": "workspace:*",
+        "@dtask/schemas": "workspace:*",
         "@dtask/server": "workspace:*",
         "@dtask/ui": "workspace:*",
         "@orpc/client": "^1.13.9",
@@ -138,11 +139,14 @@
     },
     "packages/schemas": {
       "name": "@dtask/schemas",
-      "devDependencies": {
+      "dependencies": {
         "@dtask/db": "workspace:*",
-        "@types/bun": "latest",
         "drizzle-orm": "^1.0.0-beta.18-7eb39f0",
         "zod": "catalog:",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "tsdown": "^0.16.5",
       },
       "peerDependencies": {
         "typescript": "^5",
