@@ -1,9 +1,9 @@
-import { env } from "@dtask/env/server";
 import { drizzle } from "drizzle-orm/d1";
 import { tables } from "./schema";
 
-const db = drizzle(env.DB, { schema: tables });
-type Database = typeof db;
+export function createDatabase(d1: D1Database) {
+  return drizzle(d1, { schema: tables });
+}
 
-export type { Database };
-export { db, tables };
+export type Database = ReturnType<typeof createDatabase>;
+export { tables };

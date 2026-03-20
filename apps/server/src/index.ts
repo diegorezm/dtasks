@@ -1,4 +1,4 @@
-import { db } from "@dtask/db";
+import { createDatabase } from "@dtask/db";
 import { env } from "@dtask/env/server";
 import { LoggingHandlerPlugin } from "@orpc/experimental-pino";
 import { onError } from "@orpc/server";
@@ -8,10 +8,10 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import pino from "pino";
+import { authRouter } from "./domains/auth/controllers/auth.controller";
 import { SessionsRepository } from "./domains/auth/repositories/sessions.repository";
 import { UsersRepository } from "./domains/auth/repositories/users.repository";
 import { AuthService } from "./domains/auth/services/auth.service";
-import { authRouter } from "./domains/auth/controllers/auth.controller";
 
 export interface Context extends RequestHeadersPluginContext {
   authService: AuthService;
@@ -42,6 +42,8 @@ export const app = new Hono()
   )
   .get("/health", (c) => c.json({ status: "ok" }))
   .use("/rpc/*", async (c, next) => {
+    const db = createDatabase(env.DB);
+
     const authService = new AuthService(
       new UsersRepository(db),
       new SessionsRepository(db),

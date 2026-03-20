@@ -16,4 +16,15 @@ export default defineConfig({
   server: {
     port: 3001,
   },
+  optimizeDeps: {
+    exclude: ["@dtask/env/server"],
+  },
+  build: {
+    rollupOptions: {
+      external: ["cloudflare:workers"],
+    },
+  },
+  resolve: {
+    conditions: ["browser"],
+  },
 });

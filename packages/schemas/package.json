@@ -2,6 +2,7 @@
   "name": "@dtask/schemas",
   "type": "module",
   "private": true,
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -19,7 +20,8 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "tsdown": "^0.16.5"
+    "tsdown": "^0.16.5",
+    "@dtask/config": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5"

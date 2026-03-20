@@ -1,3 +1,4 @@
+import { type Login, loginSchema } from "@dtask/schemas";
 import { Button } from "@dtask/ui/components/button";
 import {
   Card,
@@ -6,21 +7,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@dtask/ui/components/card";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@dtask/ui/components/field";
 import { Input } from "@dtask/ui/components/input";
-import { Label } from "@dtask/ui/components/label";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useLogin } from "../../use_cases/use-login";
 
 export function LoginPage() {
   const navigate = useNavigate();
   const { mutate: login, isPending } = useLogin();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const form = useForm<Login>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    login(form, {
+  const onSubmit = (data: Login) => {
+    login(data, {
       onSuccess: () => navigate({ to: "/" }),
       onError: (err) => toast.error(err.message),
     });
@@ -34,37 +43,56 @@ export function LoginPage() {
           <CardDescription>Sign in to your dtask account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, email: e.target.value }))
-                }
-                required
+          <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <FieldGroup>
+              <Controller
+                name="email"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="login-email">Email</FieldLabel>
+                    <Input
+                      {...field}
+                      id="login-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, password: e.target.value }))
-                }
-                required
+              <Controller
+                name="password"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="login-password">Password</FieldLabel>
+                    <Input
+                      {...field}
+                      id="login-password"
+                      type="password"
+                      placeholder="••••••••"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
               />
-            </div>
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Signing in..." : "Sign in"}
-            </Button>
+            </FieldGroup>
           </form>
+          <Button
+            type="submit"
+            form="login-form"
+            className="mt-4 w-full"
+            disabled={isPending}
+          >
+            {isPending ? "Signing in..." : "Sign in"}
+          </Button>
           <p className="mt-4 text-center text-muted-foreground text-sm">
             Don't have an account?{" "}
             <Link

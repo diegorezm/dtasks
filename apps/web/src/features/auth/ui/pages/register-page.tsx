@@ -1,3 +1,4 @@
+import { type Register as RegisterInput, registerSchema } from "@dtask/schemas";
 import { Button } from "@dtask/ui/components/button";
 import {
   Card,
@@ -6,21 +7,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@dtask/ui/components/card";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@dtask/ui/components/field";
 import { Input } from "@dtask/ui/components/input";
-import { Label } from "@dtask/ui/components/label";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useRegister } from "../../use_cases/use-register";
 
 export function RegisterPage() {
   const navigate = useNavigate();
   const { mutate: register, isPending } = useRegister();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const form = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: { name: "", email: "", password: "" },
+  });
 
-  const handleSubmit = (e: React.SubmitEvent) => {
-    e.preventDefault();
-    register(form, {
+  const onSubmit = (data: RegisterInput) => {
+    register(data, {
       onSuccess: () => navigate({ to: "/" }),
       onError: (err) => toast.error(err.message),
     });
@@ -36,51 +45,78 @@ export function RegisterPage() {
           <CardDescription>Get started with dtask today</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Your name"
-                value={form.name}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, name: e.target.value }))
-                }
-                required
+          <form id="register-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <FieldGroup>
+              <Controller
+                name="name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="register-name">Name</FieldLabel>
+                    <Input
+                      {...field}
+                      id="register-name"
+                      type="text"
+                      placeholder="Your name"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, email: e.target.value }))
-                }
-                required
+              <Controller
+                name="email"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="register-email">Email</FieldLabel>
+                    <Input
+                      {...field}
+                      id="register-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, password: e.target.value }))
-                }
-                required
+              <Controller
+                name="password"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="register-password">
+                      Password
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="register-password"
+                      type="password"
+                      placeholder="••••••••"
+                      aria-invalid={fieldState.invalid}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
               />
-            </div>
-            <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? "Creating account..." : "Create account"}
-            </Button>
+            </FieldGroup>
           </form>
-          <p className="text-center text-sm text-muted-foreground mt-4">
+          <Button
+            type="submit"
+            form="register-form"
+            className="mt-4 w-full"
+            disabled={isPending}
+          >
+            {isPending ? "Creating account..." : "Create account"}
+          </Button>
+          <p className="mt-4 text-center text-muted-foreground text-sm">
             Already have an account?{" "}
             <Link
               to="/login"
