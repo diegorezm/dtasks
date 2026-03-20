@@ -1,6 +1,6 @@
 import { type Database, tables } from "@dtask/db";
+import type { SessionInsertModel } from "@dtask/schemas";
 import { eq } from "drizzle-orm";
-import type { SessionInsertModel } from "../models/sessions.model";
 
 export class SessionsRepository {
   constructor(private readonly db: Database) { }

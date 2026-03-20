@@ -1,7 +1,7 @@
+import { loginSchema, registerSchema } from "@dtask/schemas";
 import { ORPCError, os } from "@orpc/server";
 import { deleteCookie, getCookie, setCookie } from "@orpc/server/helpers";
 import type { Context } from "../../../index";
-import { loginSchema, registerSchema } from "../models/auth.model";
 
 const COOKIE_NAME = "session_token";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30;

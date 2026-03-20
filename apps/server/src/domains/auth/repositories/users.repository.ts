@@ -1,6 +1,6 @@
 import { type Database, tables } from "@dtask/db";
+import type { UserInsertModel } from "@dtask/schemas";
 import { eq } from "drizzle-orm";
-import type { UserInsertModel, UserUpdateModel } from "../models/users.model";
 import { generateSecureRandomString } from "@/domains/shared/crypto";
 
 export class UsersRepository {

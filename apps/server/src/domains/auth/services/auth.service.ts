@@ -1,8 +1,12 @@
-import { generateSecureRandomString, hashPassword, verifyPasswordHash } from "@/domains/shared/crypto";
-import { tryCatch, type Result } from "@/domains/shared/try-catch";
+import type { Login, Register } from "@dtask/schemas";
+import {
+  generateSecureRandomString,
+  hashPassword,
+  verifyPasswordHash,
+} from "@/domains/shared/crypto";
+import { type Result, tryCatch } from "@/domains/shared/try-catch";
 import type { SessionsRepository } from "../repositories/sessions.repository";
 import type { UsersRepository } from "../repositories/users.repository";
-import type { Login, Register } from "../models/auth.model";
 
 type Meta = { ipAddress?: string; userAgent?: string };
 
@@ -12,12 +16,24 @@ export class AuthService {
     private readonly sessionsRepository: SessionsRepository,
   ) { }
 
-  async register(data: Register, meta?: Meta): Promise<Result<{ user: NonNullable<Awaited<ReturnType<UsersRepository["insert"]>>>; token: string }>> {
-    const passwordHash = await hashPassword(data.password)
+  async register(
+    data: Register,
+    meta?: Meta,
+  ): Promise<
+    Result<{
+      user: NonNullable<Awaited<ReturnType<UsersRepository["insert"]>>>;
+      token: string;
+    }>
+  > {
+    const passwordHash = await hashPassword(data.password);
     const { data: user, error: userError } = await tryCatch(
       this.userRepository.insert({ ...data, passwordHash: passwordHash }),
     );
-    if (userError || !user) return { data: null, error: userError ?? new Error("Something went wrong.") };
+    if (userError || !user)
+      return {
+        data: null,
+        error: userError ?? new Error("Something went wrong."),
+      };
 
     const { data: token, error: sessionError } = await tryCatch(
       this.createSession(user.id, meta),
@@ -27,17 +43,37 @@ export class AuthService {
     return { data: { user, token }, error: null };
   }
 
-  async login(data: Login, meta?: Meta): Promise<Result<{ user: NonNullable<Awaited<ReturnType<UsersRepository["findByEmail"]>>>; token: string }>> {
+  async login(
+    data: Login,
+    meta?: Meta,
+  ): Promise<
+    Result<{
+      user: NonNullable<Awaited<ReturnType<UsersRepository["findByEmail"]>>>;
+      token: string;
+    }>
+  > {
     const { data: user, error: userError } = await tryCatch(
       this.userRepository.findByEmail(data.email),
     );
 
-    if (userError || !user) return { data: null, error: userError ?? new Error("User does not exist.") };
+    if (userError || !user)
+      return {
+        data: null,
+        error: userError ?? new Error("User does not exist."),
+      };
 
-    const isCorrectPassword = await verifyPasswordHash(user.passwordHash, data.password)
+    const isCorrectPassword = await verifyPasswordHash(
+      user.passwordHash,
+      data.password,
+    );
 
     if (!isCorrectPassword) {
-      return { data: null, error: new Error("Wrong password or email, please verify if the information is correct..") }
+      return {
+        data: null,
+        error: new Error(
+          "Wrong password or email, please verify if the information is correct..",
+        ),
+      };
     }
 
     const { data: token, error: sessionError } = await tryCatch(
@@ -48,12 +84,18 @@ export class AuthService {
     return { data: { user, token }, error: null };
   }
 
-  async validateSessionToken(token: string): Promise<Result<NonNullable<Awaited<ReturnType<SessionsRepository["findById"]>>>>> {
+  async validateSessionToken(
+    token: string,
+  ): Promise<
+    Result<NonNullable<Awaited<ReturnType<SessionsRepository["findById"]>>>>
+  > {
     const tokenParts = token.split(".");
-    if (tokenParts.length !== 2) return { data: null, error: new Error("Invalid token") };
+    if (tokenParts.length !== 2)
+      return { data: null, error: new Error("Invalid token") };
 
     const [sessionId, sessionSecret] = tokenParts;
-    if (!sessionId || !sessionSecret) return { data: null, error: new Error("Invalid token") };
+    if (!sessionId || !sessionSecret)
+      return { data: null, error: new Error("Invalid token") };
 
     const { data: session, error: sessionError } = await tryCatch(
       this.sessionsRepository.findById(sessionId),
@@ -80,7 +122,7 @@ export class AuthService {
     const id = generateSecureRandomString();
     const secret = generateSecureRandomString();
     const secretHash = await this.hashSecret(secret);
-    const token = id + "." + secret;
+    const token = `${id}.${secret}`;
 
     await this.sessionsRepository.insert({
       id,

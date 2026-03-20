@@ -1,0 +1,24 @@
+{
+	"name": "@dtask/schemas",
+	"type": "module",
+	"private": true,
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"zod": "catalog:",
+		"@dtask/db": "workspace:*",
+		"drizzle-orm": "^1.0.0-beta.18-7eb39f0"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
+}

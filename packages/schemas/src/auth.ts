@@ -26,6 +26,26 @@ export const userUpdateSchema = createUpdateSchema(tables.users, {
   updatedAt: true,
 });
 
+export const registerSchema = userInsertSchema
+  .pick({
+    name: true,
+    email: true,
+  })
+  .extend({
+    password: z.string().min(6),
+  });
+
+export const loginSchema = z.object({
+  email: z.email(),
+  password: z.string().min(8),
+});
+
+export type Register = z.infer<typeof registerSchema>;
+export type Login = z.infer<typeof loginSchema>;
+
+export type SessionModel = typeof tables.sessions.$inferSelect;
+export type SessionInsertModel = typeof tables.sessions.$inferInsert;
+
 export type UserInsertModel = z.infer<typeof userInsertSchema>;
 export type UserUpdateModel = z.infer<typeof userUpdateSchema>;
 export type UserModel = typeof tables.users.$inferSelect;

@@ -1,58 +1,63 @@
-import { hash, verify } from "@node-rs/argon2";
-import { sha1 } from "@oslojs/crypto/sha1";
-import { encodeHexLowerCase } from "@oslojs/encoding";
-
 export function generateSecureRandomString(): string {
-  // Human readable alphabet (a-z, 0-9 without l, o, 0, 1 to avoid confusion)
   const alphabet = "abcdefghijkmnpqrstuvwxyz23456789";
-
-  // Generate 24 bytes = 192 bits of entropy.
-  // We're only going to use 5 bits per byte so the total entropy will be 192 * 5 / 8 = 120 bits
   const bytes = new Uint8Array(24);
   crypto.getRandomValues(bytes);
-
   let id = "";
   for (let i = 0; i < bytes.length; i++) {
-    // >> 3 "removes" the right-most 3 bits of the byte
     id += alphabet[bytes[i] >> 3];
   }
   return id;
 }
 
-export async function hashPassword(password: string): Promise<string> {
-  return await hash(password, {
-    memoryCost: 19456,
-    timeCost: 2,
-    outputLen: 32,
-    parallelism: 1,
-  });
+export async function hashPassword(
+  password: string,
+  providedSalt?: Uint8Array,
+): Promise<string> {
+  const encoder = new TextEncoder();
+  const salt = providedSalt ?? crypto.getRandomValues(new Uint8Array(16));
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    { name: "PBKDF2" },
+    false,
+    ["deriveBits", "deriveKey"],
+  );
+  const key = await crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt, iterations: 100_000, hash: "SHA-256" },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    true,
+    ["encrypt", "decrypt"],
+  );
+  const exportedKey = (await crypto.subtle.exportKey(
+    "raw",
+    key,
+  )) as ArrayBuffer;
+  const hashHex = Array.from(new Uint8Array(exportedKey))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  const saltHex = Array.from(salt)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return `${saltHex}:${hashHex}`;
 }
 
 export async function verifyPasswordHash(
-  hash: string,
+  stored: string,
   password: string,
 ): Promise<boolean> {
-  return await verify(hash, password);
-}
-
-export async function verifyPasswordStrength(
-  password: string,
-): Promise<boolean> {
-  if (password.length < 8 || password.length > 255) {
-    return false;
+  const [saltHex, originalHash] = stored.split(":");
+  if (!saltHex) {
+    throw new Error("Invalid salt format");
   }
-  const hash = encodeHexLowerCase(sha1(new TextEncoder().encode(password)));
-  const hashPrefix = hash.slice(0, 5);
-  const response = await fetch(
-    `https://api.pwnedpasswords.com/range/${hashPrefix}`,
+  const matchResult = saltHex.match(/.{1,2}/g);
+  if (!matchResult) {
+    throw new Error("Invalid salt format");
+  }
+  const salt = new Uint8Array(
+    matchResult.map((byte) => Number.parseInt(byte, 16)),
   );
-  const data = await response.text();
-  const items = data.split("\n");
-  for (const item of items) {
-    const hashSuffix = item.slice(0, 35).toLowerCase();
-    if (hash === hashPrefix + hashSuffix) {
-      return false;
-    }
-  }
-  return true;
+  const attemptHashWithSalt = await hashPassword(password, salt);
+  const [, attemptHash] = attemptHashWithSalt.split(":");
+  return attemptHash === originalHash;
 }
