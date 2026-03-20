@@ -47,9 +47,15 @@ export const sessions = sqliteTable(
   (table) => [index("sessions_userId_idx").on(table.userId)],
 );
 
-export const sessionsRelations = defineRelations({ users, sessions }, (r) => ({
+export const relations = defineRelations({ users, sessions }, (r) => ({
   users: {
     sessions: r.many.sessions({
+      from: r.users.id,
+      to: r.sessions.userId,
+    }),
+  },
+  sessions: {
+    user: r.one.users({
       from: r.sessions.userId,
       to: r.users.id,
     }),
