@@ -11,35 +11,35 @@ const app = await alchemy("dtask", { stage });
 const isProd = app.stage === "prod";
 
 const db = await D1Database("database", {
-  migrationsDir: "../../packages/db/src/migrations",
-  dev: !isProd
-    ? {
-      remote: false,
-      force: true,
-    }
-    : undefined,
+	migrationsDir: "../../packages/db/src/migrations",
+	dev: !isProd
+		? {
+				remote: false,
+				force: true,
+			}
+		: undefined,
 });
 
 export const web = await TanStackStart("web", {
-  cwd: "../../apps/web",
-  bindings: {
-    VITE_SERVER_URL: alchemy.env.VITE_SERVER_URL!,
-    DB: db,
-    CORS_ORIGIN: alchemy.env.CORS_ORIGIN!,
-  },
+	cwd: "../../apps/web",
+	bindings: {
+		VITE_SERVER_URL: alchemy.env.VITE_SERVER_URL!,
+		DB: db,
+		CORS_ORIGIN: alchemy.env.CORS_ORIGIN!,
+	},
 });
 
 export const server = await Worker("server", {
-  cwd: "../../apps/server",
-  entrypoint: "src/index.ts",
-  compatibility: "node",
-  bindings: {
-    DB: db,
-    CORS_ORIGIN: alchemy.env.CORS_ORIGIN!,
-  },
-  dev: {
-    port: 3000,
-  },
+	cwd: "../../apps/server",
+	entrypoint: "src/index.ts",
+	compatibility: "node",
+	bindings: {
+		DB: db,
+		CORS_ORIGIN: alchemy.env.CORS_ORIGIN!,
+	},
+	dev: {
+		port: 3000,
+	},
 });
 
 console.log(`Web    -> ${web.url}`);

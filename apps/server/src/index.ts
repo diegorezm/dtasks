@@ -14,11 +14,11 @@ import { UsersRepository } from "./domains/auth/repositories/users.repository";
 import { AuthService } from "./domains/auth/services/auth.service";
 
 export interface Context extends RequestHeadersPluginContext {
-  authService: AuthService;
+	authService: AuthService;
 }
 
 const appRouter = {
-  auth: authRouter,
+	auth: authRouter,
 };
 
 const pinoLogger = pino();
@@ -26,36 +26,36 @@ const pinoLogger = pino();
 export type AppRouter = typeof appRouter;
 
 const handler = new RPCHandler<Context>(appRouter, {
-  interceptors: [onError((error) => pinoLogger.error(error))],
-  plugins: [new LoggingHandlerPlugin({ logger: pinoLogger })],
+	interceptors: [onError((error) => pinoLogger.error(error))],
+	plugins: [new LoggingHandlerPlugin({ logger: pinoLogger })],
 });
 
 export const app = new Hono()
-  .use(logger())
-  .use(
-    "/*",
-    cors({
-      origin: env.CORS_ORIGIN,
-      allowMethods: ["GET", "HEAD", "PUT", "POST", "DELETE", "PATCH"],
-      credentials: true,
-    }),
-  )
-  .get("/health", (c) => c.json({ status: "ok" }))
-  .use("/rpc/*", async (c, next) => {
-    const db = createDatabase(env.DB);
+	.use(logger())
+	.use(
+		"/*",
+		cors({
+			origin: env.CORS_ORIGIN,
+			allowMethods: ["GET", "HEAD", "PUT", "POST", "DELETE", "PATCH"],
+			credentials: true,
+		}),
+	)
+	.get("/health", (c) => c.json({ status: "ok" }))
+	.use("/rpc/*", async (c, next) => {
+		const db = createDatabase(env.DB);
 
-    const authService = new AuthService(
-      new UsersRepository(db),
-      new SessionsRepository(db),
-    );
+		const authService = new AuthService(
+			new UsersRepository(db),
+			new SessionsRepository(db),
+		);
 
-    const { matched, response } = await handler.handle(c.req.raw, {
-      prefix: "/rpc",
-      context: { authService, reqHeaders: c.req.raw.headers },
-    });
+		const { matched, response } = await handler.handle(c.req.raw, {
+			prefix: "/rpc",
+			context: { authService, reqHeaders: c.req.raw.headers },
+		});
 
-    if (matched) return c.newResponse(response.body, response);
-    await next();
-  });
+		if (matched) return c.newResponse(response.body, response);
+		await next();
+	});
 
 export default app;

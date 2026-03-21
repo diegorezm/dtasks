@@ -6,25 +6,25 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  plugins: [
-    tsconfigPaths(),
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
-    alchemy(),
-  ],
-  server: {
-    port: 3001,
-  },
-  optimizeDeps: {
-    exclude: ["@dtask/env/server"],
-  },
-  build: {
-    rollupOptions: {
-      external: ["cloudflare:workers"],
-    },
-  },
-  resolve: {
-    conditions: ["browser"],
-  },
+	plugins: [
+		tsconfigPaths(),
+		tailwindcss(),
+		tanstackStart(),
+		viteReact(),
+		alchemy(),
+	],
+	server: {
+		port: 3001,
+	},
+	optimizeDeps: {
+		exclude: ["@dtask/env/server"],
+	},
+	build: {
+		rollupOptions: {
+			external: ["cloudflare:workers"],
+		},
+	},
+	resolve: {
+		conditions: ["browser"],
+	},
 });

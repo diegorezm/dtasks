@@ -1,10 +1,10 @@
 import { type Database, tables } from "@dtask/db";
-import type { UserInsertModel } from "@dtask/schemas";
+import type { UserInsertModel, UserUpdateModel } from "@dtask/schemas";
 import { eq } from "drizzle-orm";
 import { generateSecureRandomString } from "@/domains/shared/crypto";
 
 export class UsersRepository {
-  constructor(private readonly db: Database) { }
+  constructor(private readonly db: Database) {}
 
   async insert(data: UserInsertModel) {
     const [user] = await this.db

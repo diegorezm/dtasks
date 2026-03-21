@@ -1,29 +1,29 @@
 {
-  "name": "@dtask/schemas",
-  "type": "module",
-  "private": true,
-  "types": "./dist/index.d.mts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.mts"
-    }
-  },
-  "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch"
-  },
-  "dependencies": {
-    "zod": "catalog:",
-    "@dtask/db": "workspace:*",
-    "drizzle-orm": "^1.0.0-beta.18-7eb39f0"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "tsdown": "^0.16.5",
-    "@dtask/config": "workspace:*"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  }
+	"name": "@dtask/schemas",
+	"type": "module",
+	"private": true,
+	"types": "./dist/index.d.mts",
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"types": "./dist/index.d.mts"
+		}
+	},
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch"
+	},
+	"dependencies": {
+		"zod": "catalog:",
+		"@dtask/db": "workspace:*",
+		"drizzle-orm": "^1.0.0-beta.18-7eb39f0"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"tsdown": "^0.16.5",
+		"@dtask/config": "workspace:*"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
 }

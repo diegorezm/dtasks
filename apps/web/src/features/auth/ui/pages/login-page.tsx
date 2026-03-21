@@ -1,13 +1,6 @@
 import { type Login, loginSchema } from "@dtask/schemas";
 import { Button } from "@dtask/ui/components/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@dtask/ui/components/card";
-import {
   Field,
   FieldError,
   FieldGroup,
@@ -36,13 +29,21 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="space-y-1">
-          <CardTitle className="font-bold text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to your dtask account</CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+      <div className="w-full max-w-sm flex flex-col gap-8">
+        <div className="flex flex-col gap-1 text-center">
+          <Link to="/" className="text-lg font-bold tracking-tight mb-2 block">
+            dtask
+          </Link>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Welcome back
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Sign in to your workspace
+          </p>
+        </div>
+
+        <div className="rounded-2xl border bg-card p-6 flex flex-col gap-6">
           <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <Controller
@@ -85,25 +86,28 @@ export function LoginPage() {
               />
             </FieldGroup>
           </form>
+
           <Button
             type="submit"
             form="login-form"
-            className="mt-4 w-full"
+            className="w-full"
             disabled={isPending}
+            size="lg"
           >
             {isPending ? "Signing in..." : "Sign in"}
           </Button>
-          <p className="mt-4 text-center text-muted-foreground text-sm">
-            Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="text-foreground underline underline-offset-4"
-            >
-              Sign up
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+
+        <p className="text-center text-sm text-muted-foreground">
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            className="text-foreground underline underline-offset-4"
+          >
+            Sign up
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import appCss from "../index.css?url";
 
-export interface RouterAppContext { }
+export type RouterAppContext = {};
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   head: () => ({
@@ -38,7 +38,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 function RootDocument() {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="">
       <head>
         <HeadContent />
       </head>
@@ -46,6 +46,7 @@ function RootDocument() {
         <div className="grid h-svh grid-rows-[auto_1fr]">
           <Outlet />
         </div>
+
         <Toaster richColors />
         <TanStackRouterDevtools position="bottom-left" />
         <Scripts />
