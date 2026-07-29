@@ -6,7 +6,7 @@ export const Route = createFileRoute("/__private")({
 		const user = await getCurrentUser();
 
 		if (!user) {
-			throw redirect({ to: "/sign-in" });
+			throw redirect({ to: "/sign-in", search: { redirect: undefined } });
 		}
 
 		return { user };

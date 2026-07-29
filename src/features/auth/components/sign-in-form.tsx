@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { ArrowRight, LoaderCircle } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { Button } from "#/components/ui/button";
@@ -24,6 +24,7 @@ type SignInErrors = Partial<Record<keyof typeof validationMessages, string>>;
 
 export function SignInForm() {
 	const navigate = useNavigate();
+	const search = useSearch({ strict: false }) as { redirect?: string };
 	const [error, setError] = useState<string>();
 	const [fieldErrors, setFieldErrors] = useState<SignInErrors>({});
 	const [isPending, setIsPending] = useState(false);
@@ -54,7 +55,11 @@ export function SignInForm() {
 			return;
 		}
 
-		await navigate({ to: "/" });
+		const redirectTo = search.redirect;
+		await navigate({
+			to:
+				redirectTo && /^\/(?!\/)/.test(redirectTo) ? redirectTo : "/dashboard",
+		});
 	}
 
 	return (

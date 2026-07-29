@@ -57,7 +57,7 @@ export function SignUpForm() {
 			return;
 		}
 
-		await navigate({ to: "/" });
+		await navigate({ to: "/onboarding" });
 	}
 
 	return (
