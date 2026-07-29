@@ -11,11 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as _privateRouteImport } from './routes/__private'
 import { Route as _publicRouteImport } from './routes/__public'
+import { Route as _privateOnboardingRouteImport } from './routes/__private/onboarding'
 import { Route as _publicIndexRouteImport } from './routes/__public/index'
 import { Route as _publicSignInRouteImport } from './routes/__public/sign-in'
 import { Route as _publicSignUpRouteImport } from './routes/__public/sign-up'
 import { Route as _privateDashboardIndexRouteImport } from './routes/__private/dashboard/index'
+import { Route as _privateDashboardWorkspaceIdRouteImport } from './routes/__private/dashboard/$workspaceId'
+import { Route as _publicInviteInvitationIdRouteImport } from './routes/__public/invite/$invitationId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as _privateDashboardWorkspaceIdProjectsIndexRouteImport } from './routes/__private/dashboard/$workspaceId/projects/index'
+import { Route as _privateDashboardWorkspaceIdProjectsProjectIdRouteImport } from './routes/__private/dashboard/$workspaceId/projects/$projectId'
 
 const _privateRoute = _privateRouteImport.update({
   id: '/__private',
@@ -24,6 +29,11 @@ const _privateRoute = _privateRouteImport.update({
 const _publicRoute = _publicRouteImport.update({
   id: '/__public',
   getParentRoute: () => rootRouteImport,
+} as any)
+const _privateOnboardingRoute = _privateOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => _privateRoute,
 } as any)
 const _publicIndexRoute = _publicIndexRouteImport.update({
   id: '/',
@@ -45,50 +55,114 @@ const _privateDashboardIndexRoute = _privateDashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => _privateRoute,
 } as any)
+const _privateDashboardWorkspaceIdRoute =
+  _privateDashboardWorkspaceIdRouteImport.update({
+    id: '/dashboard/$workspaceId',
+    path: '/dashboard/$workspaceId',
+    getParentRoute: () => _privateRoute,
+  } as any)
+const _publicInviteInvitationIdRoute =
+  _publicInviteInvitationIdRouteImport.update({
+    id: '/invite/$invitationId',
+    path: '/invite/$invitationId',
+    getParentRoute: () => _publicRoute,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const _privateDashboardWorkspaceIdProjectsIndexRoute =
+  _privateDashboardWorkspaceIdProjectsIndexRouteImport.update({
+    id: '/projects/',
+    path: '/projects/',
+    getParentRoute: () => _privateDashboardWorkspaceIdRoute,
+  } as any)
+const _privateDashboardWorkspaceIdProjectsProjectIdRoute =
+  _privateDashboardWorkspaceIdProjectsProjectIdRouteImport.update({
+    id: '/projects/$projectId',
+    path: '/projects/$projectId',
+    getParentRoute: () => _privateDashboardWorkspaceIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof _publicIndexRoute
+  '/onboarding': typeof _privateOnboardingRoute
   '/sign-in': typeof _publicSignInRoute
   '/sign-up': typeof _publicSignUpRoute
+  '/dashboard/$workspaceId': typeof _privateDashboardWorkspaceIdRouteWithChildren
+  '/invite/$invitationId': typeof _publicInviteInvitationIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/': typeof _privateDashboardIndexRoute
+  '/dashboard/$workspaceId/projects/$projectId': typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
+  '/dashboard/$workspaceId/projects/': typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof _publicIndexRoute
+  '/onboarding': typeof _privateOnboardingRoute
   '/sign-in': typeof _publicSignInRoute
   '/sign-up': typeof _publicSignUpRoute
+  '/dashboard/$workspaceId': typeof _privateDashboardWorkspaceIdRouteWithChildren
+  '/invite/$invitationId': typeof _publicInviteInvitationIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard': typeof _privateDashboardIndexRoute
+  '/dashboard/$workspaceId/projects/$projectId': typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
+  '/dashboard/$workspaceId/projects': typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/__private': typeof _privateRouteWithChildren
   '/__public': typeof _publicRouteWithChildren
+  '/__private/onboarding': typeof _privateOnboardingRoute
   '/__public/sign-in': typeof _publicSignInRoute
   '/__public/sign-up': typeof _publicSignUpRoute
   '/__public/': typeof _publicIndexRoute
+  '/__private/dashboard/$workspaceId': typeof _privateDashboardWorkspaceIdRouteWithChildren
+  '/__public/invite/$invitationId': typeof _publicInviteInvitationIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/__private/dashboard/': typeof _privateDashboardIndexRoute
+  '/__private/dashboard/$workspaceId/projects/$projectId': typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
+  '/__private/dashboard/$workspaceId/projects/': typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sign-in' | '/sign-up' | '/api/auth/$' | '/dashboard/'
+  fullPaths:
+    | '/'
+    | '/onboarding'
+    | '/sign-in'
+    | '/sign-up'
+    | '/dashboard/$workspaceId'
+    | '/invite/$invitationId'
+    | '/api/auth/$'
+    | '/dashboard/'
+    | '/dashboard/$workspaceId/projects/$projectId'
+    | '/dashboard/$workspaceId/projects/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sign-in' | '/sign-up' | '/api/auth/$' | '/dashboard'
+  to:
+    | '/'
+    | '/onboarding'
+    | '/sign-in'
+    | '/sign-up'
+    | '/dashboard/$workspaceId'
+    | '/invite/$invitationId'
+    | '/api/auth/$'
+    | '/dashboard'
+    | '/dashboard/$workspaceId/projects/$projectId'
+    | '/dashboard/$workspaceId/projects'
   id:
     | '__root__'
     | '/__private'
     | '/__public'
+    | '/__private/onboarding'
     | '/__public/sign-in'
     | '/__public/sign-up'
     | '/__public/'
+    | '/__private/dashboard/$workspaceId'
+    | '/__public/invite/$invitationId'
     | '/api/auth/$'
     | '/__private/dashboard/'
+    | '/__private/dashboard/$workspaceId/projects/$projectId'
+    | '/__private/dashboard/$workspaceId/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -112,6 +186,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof _publicRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/__private/onboarding': {
+      id: '/__private/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof _privateOnboardingRouteImport
+      parentRoute: typeof _privateRoute
     }
     '/__public/': {
       id: '/__public/'
@@ -141,6 +222,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof _privateDashboardIndexRouteImport
       parentRoute: typeof _privateRoute
     }
+    '/__private/dashboard/$workspaceId': {
+      id: '/__private/dashboard/$workspaceId'
+      path: '/dashboard/$workspaceId'
+      fullPath: '/dashboard/$workspaceId'
+      preLoaderRoute: typeof _privateDashboardWorkspaceIdRouteImport
+      parentRoute: typeof _privateRoute
+    }
+    '/__public/invite/$invitationId': {
+      id: '/__public/invite/$invitationId'
+      path: '/invite/$invitationId'
+      fullPath: '/invite/$invitationId'
+      preLoaderRoute: typeof _publicInviteInvitationIdRouteImport
+      parentRoute: typeof _publicRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -148,14 +243,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/__private/dashboard/$workspaceId/projects/': {
+      id: '/__private/dashboard/$workspaceId/projects/'
+      path: '/projects'
+      fullPath: '/dashboard/$workspaceId/projects/'
+      preLoaderRoute: typeof _privateDashboardWorkspaceIdProjectsIndexRouteImport
+      parentRoute: typeof _privateDashboardWorkspaceIdRoute
+    }
+    '/__private/dashboard/$workspaceId/projects/$projectId': {
+      id: '/__private/dashboard/$workspaceId/projects/$projectId'
+      path: '/projects/$projectId'
+      fullPath: '/dashboard/$workspaceId/projects/$projectId'
+      preLoaderRoute: typeof _privateDashboardWorkspaceIdProjectsProjectIdRouteImport
+      parentRoute: typeof _privateDashboardWorkspaceIdRoute
+    }
   }
 }
 
+interface _privateDashboardWorkspaceIdRouteChildren {
+  _privateDashboardWorkspaceIdProjectsProjectIdRoute: typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
+  _privateDashboardWorkspaceIdProjectsIndexRoute: typeof _privateDashboardWorkspaceIdProjectsIndexRoute
+}
+
+const _privateDashboardWorkspaceIdRouteChildren: _privateDashboardWorkspaceIdRouteChildren =
+  {
+    _privateDashboardWorkspaceIdProjectsProjectIdRoute:
+      _privateDashboardWorkspaceIdProjectsProjectIdRoute,
+    _privateDashboardWorkspaceIdProjectsIndexRoute:
+      _privateDashboardWorkspaceIdProjectsIndexRoute,
+  }
+
+const _privateDashboardWorkspaceIdRouteWithChildren =
+  _privateDashboardWorkspaceIdRoute._addFileChildren(
+    _privateDashboardWorkspaceIdRouteChildren,
+  )
+
 interface _privateRouteChildren {
+  _privateOnboardingRoute: typeof _privateOnboardingRoute
+  _privateDashboardWorkspaceIdRoute: typeof _privateDashboardWorkspaceIdRouteWithChildren
   _privateDashboardIndexRoute: typeof _privateDashboardIndexRoute
 }
 
 const _privateRouteChildren: _privateRouteChildren = {
+  _privateOnboardingRoute: _privateOnboardingRoute,
+  _privateDashboardWorkspaceIdRoute:
+    _privateDashboardWorkspaceIdRouteWithChildren,
   _privateDashboardIndexRoute: _privateDashboardIndexRoute,
 }
 
@@ -167,12 +299,14 @@ interface _publicRouteChildren {
   _publicSignInRoute: typeof _publicSignInRoute
   _publicSignUpRoute: typeof _publicSignUpRoute
   _publicIndexRoute: typeof _publicIndexRoute
+  _publicInviteInvitationIdRoute: typeof _publicInviteInvitationIdRoute
 }
 
 const _publicRouteChildren: _publicRouteChildren = {
   _publicSignInRoute: _publicSignInRoute,
   _publicSignUpRoute: _publicSignUpRoute,
   _publicIndexRoute: _publicIndexRoute,
+  _publicInviteInvitationIdRoute: _publicInviteInvitationIdRoute,
 }
 
 const _publicRouteWithChildren =
