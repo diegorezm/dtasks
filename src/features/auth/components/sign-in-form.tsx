@@ -10,6 +10,7 @@ import {
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
 import { authClient } from "../auth-client";
+import { GoogleAuthButton } from "./google-auth-button";
 
 export function SignInForm() {
 	const navigate = useNavigate();
@@ -40,6 +41,7 @@ export function SignInForm() {
 	return (
 		<form onSubmit={handleSubmit}>
 			<FieldGroup>
+				<GoogleAuthButton />
 				<Field data-disabled={isPending || undefined}>
 					<FieldLabel htmlFor="email">Email</FieldLabel>
 					<Input

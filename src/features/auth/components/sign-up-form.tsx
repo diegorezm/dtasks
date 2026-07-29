@@ -11,6 +11,7 @@ import {
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
 import { authClient } from "../auth-client";
+import { GoogleAuthButton } from "./google-auth-button";
 
 export function SignUpForm() {
 	const navigate = useNavigate();
@@ -45,6 +46,7 @@ export function SignUpForm() {
 	return (
 		<form onSubmit={handleSubmit}>
 			<FieldGroup>
+				<GoogleAuthButton />
 				<Field data-disabled={isPending || undefined}>
 					<FieldLabel htmlFor="name">Name</FieldLabel>
 					<Input
