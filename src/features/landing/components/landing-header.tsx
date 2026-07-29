@@ -4,6 +4,7 @@ import ParaglideLocaleSwitcher from "#/components/LocaleSwitcher";
 import { Button } from "#/components/ui/button";
 import { brand } from "#/core/branding/brand";
 import { BrandLogo } from "#/core/branding/brand-logo";
+import { UserButton } from "#/features/auth/components/user-button";
 import { m } from "#/paraglide/messages";
 
 export function LandingHeader() {
@@ -33,12 +34,14 @@ export function LandingHeader() {
 				</div>
 				<div className="flex items-center gap-3">
 					<ParaglideLocaleSwitcher />
-					<Button
-						asChild
-						className="hidden rounded-lg bg-primary text-sm font-bold text-primary-foreground hover:bg-primary/90 sm:inline-flex"
-					>
-						<Link to="/dashboard">{m.start_workspace()}</Link>
-					</Button>
+					<UserButton
+						className="hidden sm:inline-flex"
+						fallback={
+							<Button asChild className="hidden sm:inline-flex">
+								<Link to="/dashboard">{m.start_workspace()}</Link>
+							</Button>
+						}
+					/>
 				</div>
 				<Link
 					className="grid size-9 place-items-center rounded-lg text-foreground sm:hidden"

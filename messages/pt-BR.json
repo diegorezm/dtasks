@@ -93,5 +93,7 @@
   "signup_error": "Não foi possível criar sua conta. Tente novamente.",
   "validation_name": "Digite seu nome.",
   "validation_email": "Digite um endereço de e-mail válido.",
-  "validation_password": "Use uma senha entre 8 e 128 caracteres."
+  "validation_password": "Use uma senha entre 8 e 128 caracteres.",
+  "user_loading": "Carregando usuário…",
+  "sign_out": "Sair"
 }

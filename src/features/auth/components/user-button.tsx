@@ -1,19 +1,26 @@
+import type { ReactNode } from "react";
 import { Button } from "#/components/ui/button";
+import { m } from "#/paraglide/messages";
 import { authClient } from "../auth-client";
 
-export function UserButton() {
+type UserButtonProps = {
+	className?: string;
+	fallback?: ReactNode;
+};
+
+export function UserButton({ className, fallback = null }: UserButtonProps) {
 	const { data: session, isPending } = authClient.useSession();
 
 	if (isPending) {
 		return (
-			<Button disabled size="sm" variant="ghost">
-				Loading user…
+			<Button disabled size="sm" variant="ghost" className={className}>
+				{m.user_loading()}
 			</Button>
 		);
 	}
 
 	if (!session?.user) {
-		return null;
+		return fallback;
 	}
 
 	const userInitial = session.user.name?.charAt(0).toUpperCase() || "U";
@@ -22,6 +29,7 @@ export function UserButton() {
 		<Button
 			type="button"
 			variant="outline"
+			className={className}
 			onClick={() => {
 				void authClient.signOut({
 					fetchOptions: {
@@ -41,7 +49,7 @@ export function UserButton() {
 					{userInitial}
 				</span>
 			)}
-			<span>Sign out</span>
+			<span>{m.sign_out()}</span>
 		</Button>
 	);
 }

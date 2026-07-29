@@ -93,5 +93,7 @@
   "signup_error": "Unable to create your account. Please try again.",
   "validation_name": "Enter your name.",
   "validation_email": "Enter a valid email address.",
-  "validation_password": "Use a password between 8 and 128 characters."
+  "validation_password": "Use a password between 8 and 128 characters.",
+  "user_loading": "Loading user…",
+  "sign_out": "Sign out"
 }
