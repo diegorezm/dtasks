@@ -6,7 +6,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-
+import { brand } from "#/core/branding/brand";
 import { getLocale } from "#/paraglide/runtime";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
@@ -34,7 +34,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "DTasks | Shared project clarity",
+				title: `${brand.name} | ${brand.tagline}`,
 			},
 		],
 		links: [

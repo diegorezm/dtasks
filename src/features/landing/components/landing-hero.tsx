@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { Card } from "#/components/ui/card";
+import { brand } from "#/core/branding/brand";
 
 export function LandingHero() {
 	return (
@@ -22,25 +23,16 @@ export function LandingHero() {
 					Every project has a next clear move.
 				</h1>
 				<p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
-					DTasks gives delivery teams one live workflow, then gives customers a
-					calm view of exactly what concerns them.
+					{brand.name} gives delivery teams one live workflow, then gives
+					customers a calm view of exactly what concerns them.
 				</p>
 				<div className="mt-8 flex flex-col gap-3 sm:flex-row">
-					<Button
-						asChild
-						size="lg"
-						className="rounded-xl bg-primary font-bold text-primary-foreground shadow-[0_12px_25px_rgba(0,0,0,0.12)] hover:-translate-y-0.5 hover:bg-primary/90"
-					>
+					<Button asChild size="lg">
 						<a href="#start">
 							Start a workspace <ArrowRight size={18} />
 						</a>
 					</Button>
-					<Button
-						asChild
-						variant="outline"
-						size="lg"
-						className="rounded-xl border-border bg-card font-bold text-foreground hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground"
-					>
+					<Button asChild variant="outline" size="lg">
 						<a href="#workflow">
 							See work in motion <MoveRight size={18} />
 						</a>

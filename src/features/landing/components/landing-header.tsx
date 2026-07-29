@@ -1,5 +1,7 @@
 import { Menu } from "lucide-react";
 import { Button } from "#/components/ui/button";
+import { brand } from "#/core/branding/brand";
+import { BrandLogo } from "#/core/branding/brand-logo";
 
 export function LandingHeader() {
 	return (
@@ -9,16 +11,11 @@ export function LandingHeader() {
 				aria-label="Main navigation"
 			>
 				<a
-					className="flex items-center gap-2.5 no-underline"
+					className="no-underline"
 					href="#top"
-					aria-label="DTasks home"
+					aria-label={`${brand.name} home`}
 				>
-					<span className="grid size-8 place-items-center rounded-lg bg-primary text-sm font-extrabold text-primary-foreground">
-						D
-					</span>
-					<span className="font-extrabold tracking-[-0.04em] text-foreground">
-						DTasks
-					</span>
+					<BrandLogo />
 				</a>
 				<div className="hidden items-center gap-7 text-sm font-semibold sm:flex">
 					<a className="nav-link" href="#workflow">
