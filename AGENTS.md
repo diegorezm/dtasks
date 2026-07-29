@@ -36,6 +36,44 @@ src/
 Keep `src/routes` as the framework routing boundary while feature route
 definitions and feature behavior remain colocated where practical.
 
+## Feature Intake and Delivery
+
+For every product request, first decide whether it is a **feature**. Treat it
+as a feature when it delivers a distinct user-facing capability or workflow
+with its own domain behavior, data access, permissions, routes, or multiple
+related UI states. Examples include project invitations, issue management, and
+customer approvals. Small styling changes, isolated bug fixes, copy changes,
+and narrow extensions to an existing workflow are not features unless they
+materially create a new capability.
+
+When a request is a feature:
+
+1. State the feature classification and the intended outcome briefly.
+2. Inspect the existing code and conventions before choosing the structure.
+3. Ask clarifying questions only when an answer materially changes scope,
+   behavior, permissions, or the data model. Ask at most **three** questions
+   in total, preferably in one batch. If safe, make a reasonable assumption,
+   state it, and continue rather than blocking on a preference.
+4. Define the smallest MVP scope, including the affected surface (internal
+   dashboard, customer portal, or both), roles, data boundaries, and primary
+   success path. Keep nonessential variants out of the first implementation.
+5. Implement the feature as a self-contained `src/features/<feature>/` area.
+   Colocate its components, hooks, types, views, data access, and route
+   definitions as applicable; create only the folders the feature needs.
+   Expose shared code deliberately through `src/core` or another shared area.
+6. Enforce authorization and project/customer scoping in Convex or other
+   backend boundaries. Frontend guards may improve UX but are never the only
+   access control.
+7. Use shadcn/ui for new interface primitives, wire the framework route
+   boundary in `src/routes`, regenerate generated route files with their
+   owning command, and verify the implementation with the most relevant
+   checks.
+8. Report what was implemented, the assumptions made, and verification run.
+
+For non-feature requests, make the smallest focused change in the existing
+ownership area and avoid introducing a new feature directory or abstraction
+without a clear need.
+
 ## Development Rules
 
 - Use `pnpm`, not npm or yarn.
