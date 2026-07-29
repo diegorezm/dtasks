@@ -1,5 +1,5 @@
 import { Button } from "#/components/ui/button";
-import { authClient } from "#/lib/auth-client";
+import { authClient } from "../auth-client";
 
 export function UserButton() {
 	const { data: session, isPending } = authClient.useSession();
@@ -23,7 +23,11 @@ export function UserButton() {
 			type="button"
 			variant="outline"
 			onClick={() => {
-				void authClient.signOut();
+				void authClient.signOut({
+					fetchOptions: {
+						onSuccess: () => window.location.reload(),
+					},
+				});
 			}}
 		>
 			{session.user.image ? (

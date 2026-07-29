@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
 	ArrowRight,
 	CircleCheck,
@@ -28,9 +29,9 @@ export function LandingHero() {
 				</p>
 				<div className="mt-8 flex flex-col gap-3 sm:flex-row">
 					<Button asChild size="lg">
-						<a href="#start">
+						<Link to="/dashboard">
 							Start a workspace <ArrowRight size={18} />
-						</a>
+						</Link>
 					</Button>
 					<Button asChild variant="outline" size="lg">
 						<a href="#workflow">
