@@ -7,9 +7,34 @@ DTasks is a B2B project-management platform with two surfaces:
 - Internal dashboard for company users.
 - Branded customer portal for invited customers.
 
-Core domain entities include organizations, members, projects, project
-customers, kanban boards and cards, customer panels, issues, comments,
-categories, and review requests.
+Organize application code around features, not file types. A feature should
+keep its related UI, hooks, types, data access, and routes together. Avoid
+scattering one feature across global `components/`, `hooks/`, `types/`, and
+`pages/` directories.
+
+Keep app-wide concerns in shared areas such as core configuration, providers,
+layouts, styles, and reusable utilities. Keep feature-specific logic inside
+its feature. If a type or utility is needed by multiple features, move it to a
+shared location instead of importing private implementation details across
+features.
+
+Prefer a structure like:
+
+```text
+src/
+  core/       # app-wide configuration, providers, styles, shared utilities
+  layouts/    # application-level page structure
+  features/   # self-contained product features
+    <feature>/
+      components/
+      hooks/
+      types/
+      views/
+      routes.ts
+```
+
+Keep `src/routes` as the framework routing boundary while feature route
+definitions and feature behavior remain colocated where practical.
 
 ## Development Rules
 
@@ -23,6 +48,22 @@ categories, and review requests.
   frontend route guards.
 - Keep internal dashboard behavior separate from customer portal behavior.
 - Prefer small, focused changes that support the MVP before adding abstractions.
+
+## UI Components
+
+- Use shadcn/ui for UI components.
+- Add new shadcn/ui components with `pnpm dlx shadcn@latest add <component>`.
+
+## Commits
+
+Use this format:
+
+```text
+<action>(optional): <commit>
+```
+
+Examples: `feat: add issue filters`, `fix(auth): scope customer session`,
+`refactor: split project feature`, `docs: update local setup`.
 
 ## Stack
 
