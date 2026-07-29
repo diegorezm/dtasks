@@ -10,6 +10,7 @@ import {
 	CardTitle,
 } from "#/components/ui/card";
 import { BrandLogo } from "#/core/branding/brand-logo";
+import { m } from "#/paraglide/messages";
 
 interface AuthShellProps {
 	children: ReactNode;
@@ -23,16 +24,16 @@ interface AuthShellProps {
 
 const projectCopy = {
 	"sign-in": {
-		eyebrow: "Your work, right where you left it",
-		heading: "Pick up the thread.",
-		body: "Decisions, owners, and next steps stay together—so the team can move without another status meeting.",
-		status: "3 of 4 aligned",
+		eyebrow: () => m.project_signin_eyebrow(),
+		heading: () => m.project_signin_heading(),
+		body: () => m.project_signin_body(),
+		status: () => m.project_signin_status(),
 	},
 	"sign-up": {
-		eyebrow: "A calmer way to run projects",
-		heading: "Turn the plan into progress.",
-		body: "Give your team and customers one clear place to see what matters, who owns it, and what happens next.",
-		status: "Ready to share",
+		eyebrow: () => m.project_signup_eyebrow(),
+		heading: () => m.project_signup_heading(),
+		body: () => m.project_signup_body(),
+		status: () => m.project_signup_status(),
 	},
 } as const;
 
@@ -55,12 +56,12 @@ function ProjectBrief({ mode }: Pick<AuthShellProps, "mode">) {
 
 			<div className="relative mx-auto flex w-full max-w-xl flex-col gap-9 py-12">
 				<div className="flex max-w-lg flex-col gap-4">
-					<p className="island-kicker">{copy.eyebrow}</p>
+					<p className="island-kicker">{copy.eyebrow()}</p>
 					<h1 className="display-title text-5xl leading-[0.98] tracking-[-0.045em] text-foreground xl:text-6xl">
-						{copy.heading}
+						{copy.heading()}
 					</h1>
 					<p className="max-w-md text-base leading-7 text-muted-foreground">
-						{copy.body}
+						{copy.body()}
 					</p>
 				</div>
 
@@ -73,16 +74,13 @@ function ProjectBrief({ mode }: Pick<AuthShellProps, "mode">) {
 						<div className="flex items-start justify-between gap-6 border-b pb-5">
 							<div className="flex flex-col gap-2">
 								<p className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-									Client launch · This week
+									{m.project_label()}
 								</p>
 								<h2 className="text-xl font-semibold tracking-tight">
-									Website handoff
+									{m.project_title()}
 								</h2>
 							</div>
-							<ul
-								className="flex -space-x-2"
-								aria-label="Three project members"
-							>
+							<ul className="flex -space-x-2" aria-label={m.project_members()}>
 								{["AM", "DK", "JL"].map((initials) => (
 									<li
 										key={initials}
@@ -100,19 +98,19 @@ function ProjectBrief({ mode }: Pick<AuthShellProps, "mode">) {
 									<Check className="size-3.5" aria-hidden="true" />
 								</span>
 								<span className="flex-1 text-sm font-medium line-through opacity-60">
-									Approve final direction
+									{m.task_approve()}
 								</span>
 								<span className="font-mono text-xs text-muted-foreground">
-									Done
+									{m.task_done()}
 								</span>
 							</div>
 							<div className="flex items-center gap-3 rounded-lg bg-accent px-2 py-3">
 								<Circle className="size-6 text-primary" aria-hidden="true" />
 								<span className="flex-1 text-sm font-semibold">
-									Share staging with customer
+									{m.task_share()}
 								</span>
 								<span className="rounded-md bg-background px-2 py-1 font-mono text-[0.65rem] font-bold">
-									Today
+									{m.task_today()}
 								</span>
 							</div>
 							<div className="flex items-center gap-3 rounded-lg px-2 py-3">
@@ -121,10 +119,10 @@ function ProjectBrief({ mode }: Pick<AuthShellProps, "mode">) {
 									aria-hidden="true"
 								/>
 								<span className="flex-1 text-sm font-medium">
-									Collect launch notes
+									{m.task_collect()}
 								</span>
 								<span className="font-mono text-xs text-muted-foreground">
-									Fri
+									{m.task_friday()}
 								</span>
 							</div>
 						</div>
@@ -132,16 +130,16 @@ function ProjectBrief({ mode }: Pick<AuthShellProps, "mode">) {
 						<div className="flex items-center justify-between border-t pt-5 text-sm">
 							<span className="flex items-center gap-2 text-muted-foreground">
 								<UsersRound className="size-4" aria-hidden="true" />
-								Team + customer
+								{m.team_customer()}
 							</span>
-							<span className="font-semibold">{copy.status}</span>
+							<span className="font-semibold">{copy.status()}</span>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<p className="relative font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted-foreground">
-				Shared project clarity
+				{m.shared_project_clarity()}
 			</p>
 		</section>
 	);
@@ -170,7 +168,7 @@ export function AuthShell({
 				<Card className="w-full max-w-md border-0 bg-transparent shadow-none">
 					<CardHeader className="gap-3 px-0">
 						<p className="font-mono text-[0.68rem] font-bold uppercase tracking-[0.18em] text-primary">
-							{mode === "sign-in" ? "Welcome back" : "Start your workspace"}
+							{mode === "sign-in" ? m.signin_eyebrow() : m.signup_eyebrow()}
 						</p>
 						<CardTitle className="display-title text-4xl leading-none tracking-[-0.04em]">
 							{title}

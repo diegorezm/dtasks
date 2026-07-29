@@ -10,6 +10,7 @@ import {
 	FieldLabel,
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
+import { m } from "#/paraglide/messages";
 import { authClient } from "../auth-client";
 import { GoogleAuthButton } from "./google-auth-button";
 
@@ -33,10 +34,7 @@ export function SignUpForm() {
 		setIsPending(false);
 
 		if (result.error) {
-			setError(
-				result.error.message ??
-					"Unable to create your account. Please try again.",
-			);
+			setError(result.error.message ?? m.signup_error());
 			return;
 		}
 
@@ -48,19 +46,19 @@ export function SignUpForm() {
 			<FieldGroup>
 				<GoogleAuthButton />
 				<Field data-disabled={isPending || undefined}>
-					<FieldLabel htmlFor="name">Name</FieldLabel>
+					<FieldLabel htmlFor="name">{m.field_name()}</FieldLabel>
 					<Input
 						id="name"
 						name="name"
 						autoComplete="name"
-						placeholder="Your name"
+						placeholder={m.placeholder_name()}
 						required
 						disabled={isPending}
 						className="h-11"
 					/>
 				</Field>
 				<Field data-disabled={isPending || undefined}>
-					<FieldLabel htmlFor="email">Work email</FieldLabel>
+					<FieldLabel htmlFor="email">{m.field_work_email()}</FieldLabel>
 					<Input
 						id="email"
 						name="email"
@@ -73,7 +71,7 @@ export function SignUpForm() {
 					/>
 				</Field>
 				<Field data-disabled={isPending || undefined}>
-					<FieldLabel htmlFor="password">Password</FieldLabel>
+					<FieldLabel htmlFor="password">{m.field_password()}</FieldLabel>
 					<Input
 						id="password"
 						name="password"
@@ -82,17 +80,17 @@ export function SignUpForm() {
 						minLength={8}
 						required
 						disabled={isPending}
-						placeholder="At least 8 characters"
+						placeholder={m.placeholder_password_min()}
 						className="h-11"
 					/>
-					<FieldDescription>Use at least 8 characters.</FieldDescription>
+					<FieldDescription>{m.password_hint()}</FieldDescription>
 				</Field>
 				{error ? <FieldError>{error}</FieldError> : null}
 				<Button type="submit" size="lg" className="w-full" disabled={isPending}>
 					{isPending ? (
 						<LoaderCircle className="animate-spin" data-icon="inline-start" />
 					) : null}
-					{isPending ? "Creating account…" : "Create workspace"}
+					{isPending ? m.signup_pending() : m.signup_submit()}
 					{isPending ? null : <ArrowRight data-icon="inline-end" />}
 				</Button>
 			</FieldGroup>

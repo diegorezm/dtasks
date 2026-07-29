@@ -9,6 +9,7 @@ import {
 	FieldLabel,
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
+import { m } from "#/paraglide/messages";
 import { authClient } from "../auth-client";
 import { GoogleAuthButton } from "./google-auth-button";
 
@@ -31,7 +32,7 @@ export function SignInForm() {
 		setIsPending(false);
 
 		if (result.error) {
-			setError(result.error.message ?? "Unable to sign in. Please try again.");
+			result.error.message ?? m.signin_error();
 			return;
 		}
 
@@ -43,7 +44,7 @@ export function SignInForm() {
 			<FieldGroup>
 				<GoogleAuthButton />
 				<Field data-disabled={isPending || undefined}>
-					<FieldLabel htmlFor="email">Email</FieldLabel>
+					<FieldLabel htmlFor="email">{m.field_email()}</FieldLabel>
 					<Input
 						id="email"
 						name="email"
@@ -56,7 +57,7 @@ export function SignInForm() {
 					/>
 				</Field>
 				<Field data-disabled={isPending || undefined}>
-					<FieldLabel htmlFor="password">Password</FieldLabel>
+					<FieldLabel htmlFor="password">{m.field_password()}</FieldLabel>
 					<Input
 						id="password"
 						name="password"
@@ -64,7 +65,7 @@ export function SignInForm() {
 						autoComplete="current-password"
 						required
 						disabled={isPending}
-						placeholder="Your password"
+						placeholder={m.placeholder_password()}
 						className="h-11"
 					/>
 				</Field>
@@ -73,7 +74,7 @@ export function SignInForm() {
 					{isPending ? (
 						<LoaderCircle className="animate-spin" data-icon="inline-start" />
 					) : null}
-					{isPending ? "Signing in…" : "Sign in"}
+					{isPending ? m.signin_pending() : m.signin_submit()}
 					{isPending ? null : <ArrowRight data-icon="inline-end" />}
 				</Button>
 			</FieldGroup>

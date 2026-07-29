@@ -9,6 +9,7 @@ import {
 import { Button } from "#/components/ui/button";
 import { Card } from "#/components/ui/card";
 import { brand } from "#/core/branding/brand";
+import { m } from "#/paraglide/messages";
 
 export function LandingHero() {
 	return (
@@ -18,32 +19,30 @@ export function LandingHero() {
 		>
 			<div className="rise-in">
 				<p className="island-kicker mb-5 flex items-center gap-2">
-					<Sparkles size={15} /> Work, visible end to end
+					<Sparkles size={15} /> {m.landing_kicker()}
 				</p>
 				<h1 className="display-title max-w-2xl text-5xl leading-[0.97] tracking-[-0.04em] text-foreground sm:text-6xl lg:text-7xl">
-					Every project has a next clear move.
+					{m.landing_title()}
 				</h1>
 				<p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
-					{brand.name} gives delivery teams one live workflow, then gives
-					customers a calm view of exactly what concerns them.
+					{m.landing_description({ brand: brand.name })}
 				</p>
 				<div className="mt-8 flex flex-col gap-3 sm:flex-row">
 					<Button asChild size="lg">
 						<Link to="/dashboard">
-							Start a workspace <ArrowRight size={18} />
+							{m.start_workspace()} <ArrowRight size={18} />
 						</Link>
 					</Button>
 					<Button asChild variant="outline" size="lg">
 						<a href="#workflow">
-							See work in motion <MoveRight size={18} />
+							{m.landing_see_work()} <MoveRight size={18} />
 						</a>
 					</Button>
 				</div>
 				<p className="mt-5 text-sm text-muted-foreground">
-					Built for teams delivering work with customers in the loop.
+					{m.landing_audience()}
 				</p>
 			</div>
-
 			<WorkflowPreview />
 		</section>
 	);
@@ -57,34 +56,38 @@ function WorkflowPreview() {
 				<div className="flex items-center justify-between border-b border-border px-2 pb-3 text-xs font-bold text-muted-foreground">
 					<span>Northstar / Website refresh</span>
 					<span className="rounded-full bg-primary/10 px-2 py-1 text-foreground">
-						Live board
+						{m.live_board()}
 					</span>
 				</div>
 				<div className="grid gap-3 pt-3 sm:grid-cols-3">
-					<BoardColumn title="Next up" count="02">
+					<BoardColumn title={m.next_up()} count="02">
 						<Task title="Confirm content map" tag="Content" />
 						<Task title="Review visual direction" tag="Design" />
 					</BoardColumn>
-					<BoardColumn title="In progress" count="02" accent>
+					<BoardColumn title={m.in_progress()} count="02" accent>
 						<Task title="Build responsive pages" tag="Development" active />
 						<Task title="Prepare handoff notes" tag="Delivery" />
 					</BoardColumn>
-					<BoardColumn title="Ready to share" count="01">
+					<BoardColumn title={m.ready_to_share()} count="01">
 						<Task title="Homepage copy" tag="Approved" done />
 					</BoardColumn>
 				</div>
 				<div className="mt-3 flex items-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-xs text-primary-foreground/70">
 					<CircleCheck size={15} className="shrink-0 text-primary-foreground" />
 					<span>
-						Customer update ready: Homepage copy moved to{" "}
-						<strong className="text-primary-foreground">Ready to share</strong>.
+						{m.customer_update_ready()}{" "}
+						<strong className="text-primary-foreground">
+							{m.ready_to_share()}.
+						</strong>
 					</span>
 				</div>
 			</Card>
 			<div className="absolute -bottom-5 -left-4 hidden max-w-52 rounded-xl border border-border bg-card p-3 shadow-[0_12px_28px_rgba(0,0,0,0.1)] backdrop-blur sm:block">
-				<p className="text-xs font-bold text-foreground">No status-chasing</p>
+				<p className="text-xs font-bold text-foreground">
+					{m.no_status_chasing()}
+				</p>
 				<p className="mt-1 text-xs leading-5 text-muted-foreground">
-					Shared board holds current answer.
+					{m.shared_board_answer()}
 				</p>
 			</div>
 		</div>
@@ -112,7 +115,6 @@ function BoardColumn({
 		</section>
 	);
 }
-
 function Task({
 	title,
 	tag,

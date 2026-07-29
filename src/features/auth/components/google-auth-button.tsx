@@ -1,5 +1,6 @@
 import { Button } from "#/components/ui/button";
 import { Field, FieldDescription } from "#/components/ui/field";
+import { m } from "#/paraglide/messages";
 
 export function GoogleAuthButton() {
 	return (
@@ -29,10 +30,10 @@ export function GoogleAuthButton() {
 						d="M12 6.01c1.47 0 2.79.51 3.83 1.5l2.87-2.88A9.65 9.65 0 0 0 12 2a10 10 0 0 0-8.96 5.53l3.35 2.61C7.18 7.77 9.39 6.01 12 6.01"
 					/>
 				</svg>
-				Continue with Google
+				{m.continue_google()}
 			</Button>
 			<FieldDescription className="text-center">
-				Google sign-in is coming later. Use email for now.
+				{m.google_coming_later()}
 			</FieldDescription>
 		</Field>
 	);

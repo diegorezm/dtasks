@@ -1,20 +1,21 @@
 import { Clock3, Eye, MessageCircleMore } from "lucide-react";
+import { m } from "#/paraglide/messages";
 
 const steps = [
 	{
 		icon: Clock3,
-		title: "Capture work",
-		text: "Turn requests into scoped tasks the whole team can place and prioritize.",
+		title: () => m.workflow_capture_title(),
+		text: () => m.workflow_capture_text(),
 	},
 	{
 		icon: MessageCircleMore,
-		title: "Keep context close",
-		text: "Make progress visible where decisions happen, instead of scattered across status messages.",
+		title: () => m.workflow_context_title(),
+		text: () => m.workflow_context_text(),
 	},
 	{
 		icon: Eye,
-		title: "Share right view",
-		text: "Give invited customers a clear window into their tickets and current status.",
+		title: () => m.workflow_share_title(),
+		text: () => m.workflow_share_text(),
 	},
 ];
 
@@ -26,21 +27,25 @@ export function WorkflowSection() {
 		>
 			<div className="page-wrap">
 				<div className="max-w-2xl">
-					<p className="island-kicker mb-4">One delivery rhythm</p>
+					<p className="island-kicker mb-4">{m.workflow_kicker()}</p>
 					<h2 className="display-title text-4xl leading-tight tracking-[-0.04em] text-foreground sm:text-5xl">
-						From incoming ask to customer-ready update.
+						{m.workflow_title()}
 					</h2>
 				</div>
 				<div className="mt-12 grid gap-7 md:grid-cols-3">
 					{steps.map((step) => (
-						<FlowStep key={step.title} {...step} />
+						<FlowStep
+							key={step.title()}
+							icon={step.icon}
+							title={step.title()}
+							text={step.text()}
+						/>
 					))}
 				</div>
 			</div>
 		</section>
 	);
 }
-
 function FlowStep({
 	icon: Icon,
 	title,
