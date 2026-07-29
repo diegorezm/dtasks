@@ -90,5 +90,8 @@
   "signup_submit": "Create workspace",
   "signup_pending": "Creating account…",
   "signin_error": "Unable to sign in. Please try again.",
-  "signup_error": "Unable to create your account. Please try again."
+  "signup_error": "Unable to create your account. Please try again.",
+  "validation_name": "Enter your name.",
+  "validation_email": "Enter a valid email address.",
+  "validation_password": "Use a password between 8 and 128 characters."
 }
