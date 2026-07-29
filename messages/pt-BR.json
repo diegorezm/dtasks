@@ -1,6 +1,8 @@
 {
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "language_label": "Idioma",
+  "language_english": "Inglês",
+  "language_portuguese_brazil": "Português do Brasil",
   "current_locale": "Idioma atual: {locale}",
   "nav_main": "Navegação principal",
   "brand_home": "Página inicial da {brand}",
