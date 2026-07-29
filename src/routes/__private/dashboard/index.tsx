@@ -1,12 +1,15 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { DashboardPage } from "#/features/dashboard/views/dashboard-page";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { api } from "../../../../convex/_generated/api";
 
 export const Route = createFileRoute("/__private/dashboard/")({
-	component: DashboardRoute,
+	loader: async ({ context }) => {
+		const workspaces = await context.queryClient.ensureQueryData(
+			context.convexQueryClient.queryOptions(api.workspaces.listMine, {}),
+		);
+		throw redirect({
+			to: workspaces[0] ? "/dashboard/$workspaceId/projects" : "/onboarding",
+			params: workspaces[0] ? { workspaceId: workspaces[0]._id } : {},
+		});
+	},
+	component: () => null,
 });
-
-function DashboardRoute() {
-	const { user } = Route.useRouteContext();
-
-	return <DashboardPage user={user} />;
-}
