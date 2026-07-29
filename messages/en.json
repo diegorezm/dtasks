@@ -95,5 +95,7 @@
   "validation_email": "Enter a valid email address.",
   "validation_password": "Use a password between 8 and 128 characters.",
   "user_loading": "Loading user…",
-  "sign_out": "Sign out"
+  "sign_out": "Sign out",
+  "user_menu": "User menu",
+  "user_menu_dashboard": "Dashboard"
 }

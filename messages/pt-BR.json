@@ -95,5 +95,7 @@
   "validation_email": "Digite um endereço de e-mail válido.",
   "validation_password": "Use uma senha entre 8 e 128 caracteres.",
   "user_loading": "Carregando usuário…",
-  "sign_out": "Sair"
+  "sign_out": "Sair",
+  "user_menu": "Menu do usuário",
+  "user_menu_dashboard": "Painel"
 }
