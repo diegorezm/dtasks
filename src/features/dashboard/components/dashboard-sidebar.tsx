@@ -33,6 +33,7 @@ type DashboardSidebarProps = {
 		email: string;
 		image?: string | null;
 	};
+	workspaceName?: string;
 };
 
 const primaryNavigation = [
@@ -49,7 +50,10 @@ const secondaryNavigation = [
 	{ label: m.dashboard_nav_help, icon: CircleHelpIcon },
 ];
 
-export function DashboardSidebar({ user }: DashboardSidebarProps) {
+export function DashboardSidebar({
+	user,
+	workspaceName,
+}: DashboardSidebarProps) {
 	const initials = (user.name || user.email)
 		.split(" ")
 		.map((part) => part[0])
@@ -59,12 +63,33 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 
 	return (
 		<Sidebar collapsible="icon" variant="inset">
-			<SidebarHeader className="px-3 py-4">
-				<BrandLogo className="group-data-[collapsible=icon]:[&>span:last-child]:hidden" />
+			<SidebarHeader className="gap-4 px-3 py-4">
+				<BrandLogo className="px-1 group-data-[collapsible=icon]:[&>span:last-child]:hidden" />
+				<div className="group-data-[collapsible=icon]:hidden">
+					<div className="flex items-center gap-3 rounded-xl border border-sidebar-border/70 bg-sidebar-accent/35 p-3 shadow-sm">
+						<div className="relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-primary text-primary-foreground shadow-sm">
+							<div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_42%,currentColor_43%,currentColor_48%,transparent_49%,transparent_68%,currentColor_69%,currentColor_74%,transparent_75%)] opacity-20" />
+							<FolderKanbanIcon
+								className="relative size-4"
+								aria-hidden="true"
+							/>
+						</div>
+						<div className="min-w-0">
+							<p className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/50">
+								{m.dashboard_workspace()}
+							</p>
+							<p className="truncate text-sm font-semibold">
+								{workspaceName ?? "DTasks"}
+							</p>
+						</div>
+					</div>
+				</div>
 			</SidebarHeader>
-			<SidebarContent>
-				<SidebarGroup>
-					<SidebarGroupLabel>{m.dashboard_workspace()}</SidebarGroupLabel>
+			<SidebarContent className="px-2">
+				<SidebarGroup className="px-0 py-2">
+					<SidebarGroupLabel className="px-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-sidebar-foreground/45">
+						{m.dashboard_workspace()}
+					</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
 							{primaryNavigation.map((item) => (
@@ -72,6 +97,7 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 									<SidebarMenuButton
 										isActive={item.active}
 										tooltip={item.label()}
+										className="relative h-10 rounded-lg px-3 text-sidebar-foreground/70 data-[active=true]:font-semibold data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-sm data-[active=true]:before:absolute data-[active=true]:before:inset-y-2 data-[active=true]:before:left-0 data-[active=true]:before:w-0.5 data-[active=true]:before:rounded-full data-[active=true]:before:bg-primary"
 									>
 										<item.icon />
 										<span>{item.label()}</span>
@@ -86,12 +112,18 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>
-				<SidebarGroup className="mt-auto">
+				<SidebarGroup className="mt-auto px-0 py-2">
+					<SidebarGroupLabel className="px-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-sidebar-foreground/45 group-data-[collapsible=icon]:hidden">
+						{m.dashboard_nav_settings()}
+					</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
 							{secondaryNavigation.map((item) => (
 								<SidebarMenuItem key={item.label()}>
-									<SidebarMenuButton tooltip={item.label()}>
+									<SidebarMenuButton
+										tooltip={item.label()}
+										className="h-9 rounded-lg px-3 text-sidebar-foreground/60 hover:text-sidebar-accent-foreground"
+									>
 										<item.icon />
 										<span>{item.label()}</span>
 									</SidebarMenuButton>
@@ -101,31 +133,41 @@ export function DashboardSidebar({ user }: DashboardSidebarProps) {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
-			<SidebarFooter className="border-t border-sidebar-border p-3">
+			<SidebarFooter className="border-t border-sidebar-border/70 p-2">
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton
 							size="lg"
+							variant="outline"
 							tooltip={m.sign_out()}
+							className="h-auto min-h-12 rounded-xl border-sidebar-border/70 bg-sidebar-accent/25 p-2.5 hover:border-sidebar-accent hover:bg-sidebar-accent group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:min-h-8! group-data-[collapsible=icon]:rounded-lg group-data-[collapsible=icon]:p-1!"
 							onClick={() => {
 								void authClient.signOut({
 									fetchOptions: { onSuccess: () => window.location.reload() },
 								});
 							}}
 						>
-							<Avatar size="sm">
+							<Avatar
+								size="sm"
+								className="ring-2 ring-sidebar-background ring-offset-1 ring-offset-sidebar"
+							>
 								{user.image ? <AvatarImage src={user.image} alt="" /> : null}
-								<AvatarFallback>{initials}</AvatarFallback>
+								<AvatarFallback className="bg-primary/15 font-mono text-xs font-semibold text-primary">
+									{initials}
+								</AvatarFallback>
 							</Avatar>
-							<span className="min-w-0 flex-1">
-								<span className="block truncate font-medium">
+							<span className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
+								<span className="block truncate text-sm font-semibold">
 									{user.name || user.email}
 								</span>
-								<span className="block truncate text-xs text-muted-foreground">
+								<span className="block truncate text-[0.68rem] text-sidebar-foreground/50">
 									{user.email}
 								</span>
 							</span>
-							<LogOutIcon />
+							<LogOutIcon
+								className="size-4 text-sidebar-foreground/45 transition-colors group-hover/menu-item:text-destructive group-data-[collapsible=icon]:hidden"
+								aria-hidden="true"
+							/>
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 				</SidebarMenu>
