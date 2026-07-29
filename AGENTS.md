@@ -1,129 +1,144 @@
 # DTasks Agent Guide
 
-## Project
+## Product
 
-DTasks is a B2B project-management platform with two surfaces:
+DTasks is B2B project-management platform with two surfaces:
 
 - Internal dashboard for company users.
 - Branded customer portal for invited customers.
 
-Organize application code around features, not file types. A feature should
-keep its related UI, hooks, types, data access, and routes together. Avoid
-scattering one feature across global `components/`, `hooks/`, `types/`, and
-`pages/` directories.
+Keep surfaces separate in routes, behavior, authorization, and data access. Scope customer data and actions to invited projects.
 
-Keep app-wide concerns in shared areas such as core configuration, providers,
-layouts, styles, and reusable utilities. Keep feature-specific logic inside
-its feature. If a type or utility is needed by multiple features, move it to a
-shared location instead of importing private implementation details across
-features.
+## Before Coding
 
-Prefer a structure like:
+1. Inspect code, conventions, routes, translations, and tests.
+2. Classify request:
+   - **Feature:** new capability with domain behavior, permissions, data access, routes, or multiple UI states.
+   - **Focused change:** bug fix, copy, styling, or narrow workflow change.
+3. For features, state classification, affected surface, outcome, and smallest useful MVP.
+4. Ask at most three questions. Ask only if answers change scope, behavior, permissions, or data model. Otherwise state assumptions and ship.
+
+## Architecture
+
+Organize by feature, not file type. Keep feature UI, hooks, types, data access, views, and routes together:
 
 ```text
 src/
-  core/       # app-wide configuration, providers, styles, shared utilities
-  layouts/    # application-level page structure
-  features/   # self-contained product features
+  core/                  # providers, config, styles, shared utilities
+  layouts/               # application-level structure
+  features/
     <feature>/
       components/
       hooks/
       types/
       views/
       routes.ts
+  routes/                # framework routing boundary
 ```
 
-Keep `src/routes` as the framework routing boundary while feature route
-definitions and feature behavior remain colocated where practical.
+Create only needed directories. Move code to shared areas only when multiple features need it. Do not import private feature code across features.
 
-## Feature Intake and Delivery
+Feature work:
 
-For every product request, first decide whether it is a **feature**. Treat it
-as a feature when it delivers a distinct user-facing capability or workflow
-with its own domain behavior, data access, permissions, routes, or multiple
-related UI states. Examples include project invitations, issue management, and
-customer approvals. Small styling changes, isolated bug fixes, copy changes,
-and narrow extensions to an existing workflow are not features unless they
-materially create a new capability.
+- Colocate behavior and routes under `src/features/<feature>/`.
+- Wire framework routes through `src/routes`.
+- Use shadcn/ui for new interface primitives.
+- Regenerate generated route files with owning command. Never edit manually.
+- Enforce authorization and project/customer scoping in Convex or other backend boundaries. Frontend guards are UX only, not access control.
+- Keep MVP narrow. Avoid speculative abstractions and variants.
 
-When a request is a feature:
+Focused changes: modify existing ownership area. Do not create feature directories or abstractions without clear need.
 
-1. State the feature classification and the intended outcome briefly.
-2. Inspect the existing code and conventions before choosing the structure.
-3. Ask clarifying questions only when an answer materially changes scope,
-   behavior, permissions, or the data model. Ask at most **three** questions
-   in total, preferably in one batch. If safe, make a reasonable assumption,
-   state it, and continue rather than blocking on a preference.
-4. Define the smallest MVP scope, including the affected surface (internal
-   dashboard, customer portal, or both), roles, data boundaries, and primary
-   success path. Keep nonessential variants out of the first implementation.
-5. Implement the feature as a self-contained `src/features/<feature>/` area.
-   Colocate its components, hooks, types, views, data access, and route
-   definitions as applicable; create only the folders the feature needs.
-   Expose shared code deliberately through `src/core` or another shared area.
-6. Enforce authorization and project/customer scoping in Convex or other
-   backend boundaries. Frontend guards may improve UX but are never the only
-   access control.
-7. Use shadcn/ui for new interface primitives, wire the framework route
-   boundary in `src/routes`, regenerate generated route files with their
-   owning command, and verify the implementation with the most relevant
-   checks.
-8. Report what was implemented, the assumptions made, and verification run.
-
-For non-feature requests, make the smallest focused change in the existing
-ownership area and avoid introducing a new feature directory or abstraction
-without a clear need.
-
-## Development Rules
-
-- Use `pnpm`, not npm or yarn.
-- Run `pnpm install` after dependency changes.
-- Run `pnpm dev` for TanStack Start.
-- Run `pnpm convex:dev` for the local anonymous Convex deployment.
-- Keep Convex running while developing or testing frontend data access.
-- Keep customer data and actions scoped to invited projects.
-- Preserve role-based authorization at backend boundaries; do not rely only on
-  frontend route guards.
-- Keep internal dashboard behavior separate from customer portal behavior.
-- Prefer small, focused changes that support the MVP before adding abstractions.
-- Add tests anytime you think they are needed, and make sure code you produce is testable in some way.
-- Any text shown to users must be localized through Paraglide. Add or update
-  the translation messages in `src/paraglide/` and use the generated Paraglide
-  messages in the UI instead of hardcoding user-visible strings.
-
-## UI Components
-
-- Use shadcn/ui for UI components.
-- Add new shadcn/ui components with `pnpm dlx shadcn@latest add <component>`.
-
-## Commits
-
-Use this format:
-
-```text
-<action>(optional): <commit>
-```
-
-Examples: `feat: add issue filters`, `fix(auth): scope customer session`,
-`refactor: split project feature`, `docs: update local setup`.
-
-## Stack
+## Stack And Commands
 
 - TanStack Start and TanStack Router
 - React and Tailwind CSS
-- Convex for backend functions and data
-- Better Auth for authentication
-- Paraglide for localization
-- Cloudflare Workers for deployment
+- Convex
+- Better Auth
+- Paraglide
+- Cloudflare Workers
 
-## Commands
+Use `pnpm`, never npm or yarn.
 
-- `pnpm dev`: start frontend development server.
-- `pnpm convex:dev`: start local Convex and sync functions.
-- `pnpm build`: build application.
-- `pnpm exec tsc --noEmit`: typecheck application.
-- `pnpm check`: run Biome checks.
-- `pnpm generate-routes`: regenerate TanStack route tree.
+```text
+pnpm dev                         # frontend development server
+pnpm convex:dev                  # local anonymous Convex deployment
+pnpm install                     # after dependency changes
+pnpm build                       # production build
+pnpm exec tsc --noEmit           # typecheck
+pnpm check                       # Biome checks
+pnpm generate-routes             # regenerate TanStack route tree
+pnpm dlx shadcn@latest add <component>
+```
 
-Generated files must be regenerated by their owning tool, not edited manually.
-Do not commit secrets or local deployment credentials.
+Keep Convex running during frontend data-access tests.
+
+## TypeScript
+
+- Never use `any` without explicit approval.
+- Avoid type assertions, especially `as unknown as X`; use correct types or type guards.
+- Never use `@ts-ignore` or `@ts-expect-error` without comment explaining exception.
+- Avoid non-null assertions unless justified.
+- Prefer `type` over `interface`.
+
+## React
+
+- Keep components small. Extract complex UI into focused components.
+- Avoid `useEffect`; use only for genuine external synchronization.
+- Compute derived values during render, not with `useEffect` and `useState`.
+- Keep business logic and data fetching in hooks or services, not components.
+- Do not mutate state; return new references.
+- Use stable IDs for list keys. Use array indexes only for static lists.
+- Do not pass inline object, array, or function literals to memoized children.
+- Avoid prop drilling beyond two or three levels. Use context or client-state store when needed.
+
+Use Zustand for complex client/UI state. Use React Query or SWR for server state. Do not put server state in Zustand.
+
+## UI And Localization
+
+- Use shadcn/ui and existing design conventions.
+- Localize every user-visible string through Paraglide.
+- Add or update messages in `src/paraglide/`; use generated messages in UI.
+- Verify desktop and mobile behavior.
+- Preserve accessibility, loading, empty, error, and permission states.
+
+## Hygiene And Dependencies
+
+- Add tests when behavior warrants them. Keep new code testable.
+- Remove commented-out code before commit.
+- Remove debug logging. Use project logger when logging is needed.
+- Ask before installing dependencies.
+- Never commit secrets, credentials, or local deployment files.
+
+## Verification And Handoff
+
+Run relevant checks, usually:
+
+```text
+pnpm check
+pnpm exec tsc --noEmit
+pnpm build
+```
+
+Report changes, assumptions, affected surface, and verification. Mention skipped checks and blockers.
+
+## Commits
+
+Use Conventional Commits:
+
+```text
+<type>(optional-scope): description
+```
+
+Allowed types include `feat`, `fix`, `refactor`, `docs`, `test`, `build`, `ci`, `chore`, `perf`, and `revert`.
+
+Use lowercase, imperative descriptions. No trailing period.
+
+Examples:
+
+```text
+feat: add issue filters
+fix(auth): scope customer session
+refactor: split project feature
+docs: update local setup
+```
