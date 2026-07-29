@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Menu } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { brand } from "#/core/branding/brand";
@@ -32,15 +33,15 @@ export function LandingHeader() {
 					asChild
 					className="hidden rounded-lg bg-primary text-sm font-bold text-primary-foreground hover:bg-primary/90 sm:inline-flex"
 				>
-					<a href="#start">Start a workspace</a>
+					<Link to="/dashboard">Start a workspace</Link>
 				</Button>
-				<a
+				<Link
 					className="grid size-9 place-items-center rounded-lg text-foreground sm:hidden"
-					href="#start"
+					to="/dashboard"
 					aria-label="Get started"
 				>
 					<Menu size={20} />
-				</a>
+				</Link>
 			</nav>
 		</header>
 	);

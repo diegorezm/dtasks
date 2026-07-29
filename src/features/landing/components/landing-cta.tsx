@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { Button } from "#/components/ui/button";
 import { brand } from "#/core/branding/brand";
@@ -20,9 +21,9 @@ export function LandingCta() {
 					size="lg"
 					className="mt-8 rounded-xl bg-primary-foreground font-bold text-primary hover:-translate-y-0.5 hover:bg-primary-foreground/90"
 				>
-					<a href={`mailto:${brand.contactEmail}`}>
-						Talk about {brand.name} <ArrowRight size={18} />
-					</a>
+					<Link to="/dashboard">
+						Start with {brand.name} <ArrowRight size={18} />
+					</Link>
 				</Button>
 			</div>
 		</section>
