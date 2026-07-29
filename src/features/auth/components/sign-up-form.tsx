@@ -12,9 +12,9 @@ import {
 import { Input } from "#/components/ui/input";
 import { getFieldErrors } from "#/core/validation/get-field-errors";
 import { m } from "#/paraglide/messages";
+import { authClient } from "../auth-client";
 import { signUpSchema } from "../schemas/auth-schemas";
 import { GoogleAuthButton } from "./google-auth-button";
-import { authClient } from "../auth-client";
 
 const validationMessages = {
 	name: m.validation_name,
