@@ -12,6 +12,8 @@
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "pnpm build && vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
@@ -56,6 +58,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "babel-plugin-react-compiler": "^1.0.0",
     "typescript": "^6.0.2",
+    "vitest": "latest",
     "vite": "^8.0.0",
     "wrangler": "^4.115.0"
   }

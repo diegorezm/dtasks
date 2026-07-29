@@ -86,6 +86,7 @@ without a clear need.
   frontend route guards.
 - Keep internal dashboard behavior separate from customer portal behavior.
 - Prefer small, focused changes that support the MVP before adding abstractions.
+- Add tests anytime you think they are needed, and make sure code you produce is testable in some way.
 - Any text shown to users must be localized through Paraglide. Add or update
   the translation messages in `src/paraglide/` and use the generated Paraglide
   messages in the UI instead of hardcoding user-visible strings.
