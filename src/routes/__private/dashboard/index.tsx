@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { DashboardPage } from "#/features/dashboard/views/dashboard-page";
 
 export const Route = createFileRoute("/__private/dashboard/")({
-	component: RouteComponent,
+	component: DashboardRoute,
 });
 
-function RouteComponent() {
-	return <div>Hello "/__private/dashboard/"!</div>;
+function DashboardRoute() {
+	const { user } = Route.useRouteContext();
+
+	return <DashboardPage user={user} />;
 }
