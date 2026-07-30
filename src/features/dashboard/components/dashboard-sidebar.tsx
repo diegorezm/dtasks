@@ -23,7 +23,6 @@ import {
 	SidebarMenuItem,
 	SidebarRail,
 } from "#/components/ui/sidebar";
-import { BrandLogo } from "#/core/branding/brand-logo";
 import { authClient } from "#/features/auth/auth-client";
 import { m } from "#/paraglide/messages";
 
@@ -64,25 +63,13 @@ export function DashboardSidebar({
 	return (
 		<Sidebar collapsible="icon" variant="inset">
 			<SidebarHeader className="gap-4 px-3 py-4">
-				<BrandLogo className="px-1 group-data-[collapsible=icon]:[&>span:last-child]:hidden" />
-				<div className="group-data-[collapsible=icon]:hidden">
-					<div className="flex items-center gap-3 rounded-xl border border-sidebar-border/70 bg-sidebar-accent/35 p-3 shadow-sm">
-						<div className="relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-primary text-primary-foreground shadow-sm">
-							<div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_42%,currentColor_43%,currentColor_48%,transparent_49%,transparent_68%,currentColor_69%,currentColor_74%,transparent_75%)] opacity-20" />
-							<FolderKanbanIcon
-								className="relative size-4"
-								aria-hidden="true"
-							/>
-						</div>
-						<div className="min-w-0">
-							<p className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/50">
-								{m.dashboard_workspace()}
-							</p>
-							<p className="truncate text-sm font-semibold">
-								{workspaceName ?? "DTasks"}
-							</p>
-						</div>
-					</div>
+				<div className="min-w-0 px-1 group-data-[collapsible=icon]:hidden">
+					<p className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-sidebar-foreground/50">
+						{m.dashboard_workspace()}
+					</p>
+					<p className="truncate text-base font-semibold">
+						{workspaceName ?? "DTasks"}
+					</p>
 				</div>
 			</SidebarHeader>
 			<SidebarContent className="px-2">
