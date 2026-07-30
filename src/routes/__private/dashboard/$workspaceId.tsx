@@ -23,7 +23,11 @@ function WorkspaceLayout() {
 	if (workspace.isLoading) return null;
 	if (!workspace.data) throw redirect({ to: "/dashboard" });
 	return (
-		<DashboardLayout user={user} workspaceName={workspace.data.name}>
+		<DashboardLayout
+			user={user}
+			workspaceId={workspaceId}
+			workspaceName={workspace.data.name}
+		>
 			<Outlet />
 		</DashboardLayout>
 	);
