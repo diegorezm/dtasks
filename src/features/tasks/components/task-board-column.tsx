@@ -1,17 +1,13 @@
 import type { DragEvent } from "react";
-import { Badge } from "#/components/ui/badge";
 import { cn } from "#/lib/utils";
 import { m } from "#/paraglide/messages";
-import type { Task, TaskStatus, WorkspaceMember } from "./task-board-types";
+import {
+	statusColors,
+	type Task,
+	type TaskStatus,
+	type WorkspaceMember,
+} from "./task-board-types";
 import { TaskCard } from "./task-card";
-
-const laneStyles: Record<TaskStatus, { marker: string; number: string }> = {
-	backlog: { marker: "bg-muted-foreground/35", number: "01" },
-	todo: { marker: "bg-muted-foreground/55", number: "02" },
-	in_progress: { marker: "bg-primary", number: "03" },
-	review: { marker: "bg-primary/70", number: "04" },
-	done: { marker: "bg-foreground", number: "05" },
-};
 
 type TaskBoardColumnProps = {
 	status: TaskStatus;
@@ -26,7 +22,7 @@ type TaskBoardColumnProps = {
 	onDragEnter: (event: DragEvent<HTMLElement>, status: TaskStatus) => void;
 	onDragOver: (event: DragEvent<HTMLElement>) => void;
 	onDrop: (event: DragEvent<HTMLElement>, status: TaskStatus) => void;
-	onDragStart: (event: DragEvent<HTMLDivElement>, taskId: string) => void;
+	onDragStart: (event: DragEvent<HTMLElement>, taskId: string) => void;
 	onDragEnd: () => void;
 	onMove: (taskId: Task["_id"], status: TaskStatus) => void;
 	onRemove: (taskId: Task["_id"]) => void;
@@ -50,37 +46,29 @@ export function TaskBoardColumn({
 	onMove,
 	onRemove,
 }: TaskBoardColumnProps) {
-	const style = laneStyles[status];
-
 	return (
 		<section
 			aria-label={label(status)}
 			className={cn(
-				"relative flex min-h-[30rem] flex-col rounded-2xl border border-border/80 bg-muted/70 p-2 shadow-[0_1px_2px_hsl(var(--foreground)/0.04)] transition-[transform,background-color,box-shadow] duration-200",
-				isDropTarget &&
-					"-translate-y-1 border-primary/50 bg-primary/12 shadow-[0_10px_28px_-20px_hsl(var(--primary)/0.5),inset_0_0_0_1px_hsl(var(--primary)/0.2)]",
+				"relative flex min-h-[32rem] flex-col rounded-xl border bg-muted/45 p-2 transition-[transform,background-color,border-color] duration-200",
+				isDropTarget && "-translate-y-0.5 border-primary/60 bg-primary/10",
 			)}
 			onDragEnter={(event) => onDragEnter(event, status)}
 			onDragOver={onDragOver}
 			onDrop={(event) => onDrop(event, status)}
 		>
-			<header className="flex items-center justify-between gap-3 px-2 pb-3 pt-2">
-				<div className="flex min-w-0 items-center gap-2.5">
+			<header className="flex items-center justify-between gap-3 px-2 pb-3 pt-1.5">
+				<div className="flex min-w-0 items-center gap-2">
 					<span
-						className={cn("size-1.5 shrink-0 rounded-full", style.marker)}
+						className={cn("size-2 shrink-0 rounded-full", statusColors[status])}
+						aria-hidden="true"
 					/>
-					<h2 className="truncate text-sm font-semibold tracking-[-0.01em]">
+					<h2 className="truncate text-xs font-semibold text-foreground/80">
 						{label(status)}
 					</h2>
-					<Badge
-						variant="secondary"
-						className="h-5 min-w-5 justify-center rounded-md px-1.5 font-mono text-[10px] tabular-nums"
-					>
-						{tasks.length}
-					</Badge>
 				</div>
-				<span className="font-mono text-[10px] tracking-[0.12em] text-muted-foreground/60">
-					{style.number}
+				<span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+					{tasks.length}
 				</span>
 			</header>
 			<div className="flex flex-1 flex-col gap-2.5">
@@ -101,7 +89,7 @@ export function TaskBoardColumn({
 					/>
 				))}
 				{tasks.length === 0 ? (
-					<div className="flex min-h-32 flex-1 items-center justify-center rounded-xl border border-dashed border-border bg-background/55 px-5 text-center">
+					<div className="flex min-h-32 flex-1 items-center justify-center rounded-lg border border-dashed bg-background/45 px-5 text-center">
 						<p className="max-w-32 text-pretty text-xs leading-5 text-muted-foreground">
 							{m.column_empty()}
 						</p>

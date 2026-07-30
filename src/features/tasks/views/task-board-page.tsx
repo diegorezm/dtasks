@@ -2,7 +2,7 @@ import { useConvexMutation } from "@convex-dev/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 import type { DragEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "#/components/ui/skeleton";
 import { routeParamId } from "#/core/convex/id";
 import { m } from "#/paraglide/messages";
@@ -15,6 +15,11 @@ import {
 	TaskBoardHeader,
 } from "../components/task-board-header";
 import { columns, type TaskStatus } from "../components/task-board-types";
+import {
+	type TaskBoardView,
+	TaskBoardViewControls,
+} from "../components/task-board-view-controls";
+import { TaskListView } from "../components/task-list-view";
 
 export function TaskBoardPage({
 	workspaceId,
@@ -59,6 +64,37 @@ export function TaskBoardPage({
 	const [query, setQuery] = useState("");
 	const [priorityFilter, setPriorityFilter] = useState("all");
 	const [assigneeFilter, setAssigneeFilter] = useState("all");
+	const [view, setView] = useState<TaskBoardView>("board");
+	const [visibleStatuses, setVisibleStatuses] = useState<TaskStatus[]>([
+		...columns,
+	]);
+	const [preferencesReady, setPreferencesReady] = useState(false);
+	const preferenceKey = `dtasks:task-view:${workspaceId}:${projectId}`;
+
+	useEffect(() => {
+		try {
+			const saved = localStorage.getItem(preferenceKey);
+			if (saved) {
+				const preferences: unknown = JSON.parse(saved);
+				if (isTaskViewPreferences(preferences)) {
+					setView(preferences.view);
+					setVisibleStatuses(preferences.visibleStatuses);
+				}
+			}
+		} catch {
+			// Preferences are optional and should never block the board.
+		} finally {
+			setPreferencesReady(true);
+		}
+	}, [preferenceKey]);
+
+	useEffect(() => {
+		if (!preferencesReady) return;
+		localStorage.setItem(
+			preferenceKey,
+			JSON.stringify({ view, visibleStatuses }),
+		);
+	}, [preferenceKey, preferencesReady, view, visibleStatuses]);
 
 	function createTask(form: FormData, close: () => void) {
 		create.mutate(
@@ -80,7 +116,7 @@ export function TaskBoardPage({
 		);
 	}
 
-	function handleDragStart(event: DragEvent<HTMLDivElement>, taskId: string) {
+	function handleDragStart(event: DragEvent<HTMLElement>, taskId: string) {
 		setDraggedTaskId(taskId);
 		event.dataTransfer.effectAllowed = "move";
 		event.dataTransfer.setData("text/plain", taskId);
@@ -138,7 +174,7 @@ export function TaskBoardPage({
 	});
 
 	return (
-		<div className="flex min-w-0 flex-col gap-7">
+		<div className="flex min-w-0 flex-col gap-5">
 			<TaskBoardHeader
 				workspaceId={workspaceId}
 				project={project.data}
@@ -165,94 +201,144 @@ export function TaskBoardPage({
 				</p>
 			) : null}
 
-			<TaskBoardFilters
-				query={query}
-				priority={priorityFilter}
-				assignee={assigneeFilter}
-				members={members.data ?? []}
-				resultCount={filteredTasks.length}
-				totalCount={taskList.length}
-				onQueryChange={setQuery}
-				onPriorityChange={setPriorityFilter}
-				onAssigneeChange={setAssigneeFilter}
-				onClear={() => {
-					setQuery("");
-					setPriorityFilter("all");
-					setAssigneeFilter("all");
-				}}
-			/>
+			<div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+				<TaskBoardFilters
+					className="min-w-0 flex-1 border-b-0 pb-0"
+					query={query}
+					priority={priorityFilter}
+					assignee={assigneeFilter}
+					members={members.data ?? []}
+					resultCount={filteredTasks.length}
+					totalCount={taskList.length}
+					onQueryChange={setQuery}
+					onPriorityChange={setPriorityFilter}
+					onAssigneeChange={setAssigneeFilter}
+					onClear={() => {
+						setQuery("");
+						setPriorityFilter("all");
+						setAssigneeFilter("all");
+					}}
+				/>
+				<TaskBoardViewControls
+					view={view}
+					visibleStatuses={visibleStatuses}
+					onViewChange={setView}
+					onVisibleStatusesChange={setVisibleStatuses}
+				/>
+			</div>
 
 			<section aria-label={m.task_board_label()}>
-				<div className="-mx-1 overflow-x-auto px-1 pb-5">
-					<div className="grid min-w-max grid-flow-col auto-cols-[minmax(18rem,1fr)] gap-3 xl:grid-flow-row xl:grid-cols-5">
-						{columns.map((status, columnIndex) => (
-							<TaskBoardColumn
-								key={status}
-								status={status}
-								columnIndex={columnIndex}
-								tasks={filteredTasks.filter((task) => task.status === status)}
-								members={members.data ?? []}
-								archived={archived}
-								isDropTarget={
-									overStatus === status && draggedTaskId !== undefined
-								}
-								draggedTaskId={draggedTaskId}
-								isMoving={move.isPending}
-								isRemoving={remove.isPending}
-								onDragEnter={(event, laneStatus) => {
-									if (!archived && draggedTaskId) {
-										event.preventDefault();
-										setOverStatus(laneStatus);
-									}
-								}}
-								onDragOver={(event) => {
-									if (!archived && draggedTaskId) event.preventDefault();
-								}}
-								onDrop={(event, laneStatus) => {
-									event.preventDefault();
-									if (!archived) handleDrop(laneStatus);
-								}}
-								onDragStart={handleDragStart}
-								onDragEnd={() => {
-									setDraggedTaskId(undefined);
-									setOverStatus(undefined);
-								}}
-								onMove={(taskId, status) =>
-									move.mutate(
-										{ taskId, status },
-										{ onError: () => setActionError(m.error_generic()) },
-									)
-								}
-								onRemove={(taskId) => {
-									if (window.confirm(m.task_delete_confirm()))
-										remove.mutate(
-											{ taskId },
-											{ onError: () => setActionError(m.error_generic()) },
-										);
-								}}
-							/>
-						))}
+				{view === "board" ? (
+					<div className="-mx-1 overflow-x-auto px-1 pb-5">
+						<div className="grid min-w-max grid-flow-col auto-cols-[minmax(17rem,1fr)] gap-3 xl:grid-flow-row xl:grid-cols-5">
+							{columns
+								.filter((status) => visibleStatuses.includes(status))
+								.map((status, columnIndex) => (
+									<TaskBoardColumn
+										key={status}
+										status={status}
+										columnIndex={columnIndex}
+										tasks={filteredTasks.filter(
+											(task) => task.status === status,
+										)}
+										members={members.data ?? []}
+										archived={archived}
+										isDropTarget={
+											overStatus === status && draggedTaskId !== undefined
+										}
+										draggedTaskId={draggedTaskId}
+										isMoving={move.isPending}
+										isRemoving={remove.isPending}
+										onDragEnter={(event, laneStatus) => {
+											if (!archived && draggedTaskId) {
+												event.preventDefault();
+												setOverStatus(laneStatus);
+											}
+										}}
+										onDragOver={(event) => {
+											if (!archived && draggedTaskId) event.preventDefault();
+										}}
+										onDrop={(event, laneStatus) => {
+											event.preventDefault();
+											if (!archived) handleDrop(laneStatus);
+										}}
+										onDragStart={handleDragStart}
+										onDragEnd={() => {
+											setDraggedTaskId(undefined);
+											setOverStatus(undefined);
+										}}
+										onMove={(taskId, status) =>
+											move.mutate(
+												{ taskId, status },
+												{ onError: () => setActionError(m.error_generic()) },
+											)
+										}
+										onRemove={(taskId) => {
+											if (window.confirm(m.task_delete_confirm()))
+												remove.mutate(
+													{ taskId },
+													{ onError: () => setActionError(m.error_generic()) },
+												);
+										}}
+									/>
+								))}
+						</div>
 					</div>
-				</div>
+				) : (
+					<TaskListView
+						tasks={filteredTasks}
+						members={members.data ?? []}
+						visibleStatuses={visibleStatuses}
+						archived={archived}
+						isMoving={move.isPending}
+						isRemoving={remove.isPending}
+						onMove={(taskId, status) =>
+							move.mutate(
+								{ taskId, status },
+								{ onError: () => setActionError(m.error_generic()) },
+							)
+						}
+						onRemove={(taskId) => {
+							if (window.confirm(m.task_delete_confirm()))
+								remove.mutate(
+									{ taskId },
+									{ onError: () => setActionError(m.error_generic()) },
+								);
+						}}
+					/>
+				)}
 			</section>
 		</div>
+	);
+}
+
+function isTaskViewPreferences(value: unknown): value is {
+	view: TaskBoardView;
+	visibleStatuses: TaskStatus[];
+} {
+	if (!value || typeof value !== "object") return false;
+	const preferences = value as Record<string, unknown>;
+	return (
+		(preferences.view === "board" || preferences.view === "list") &&
+		Array.isArray(preferences.visibleStatuses) &&
+		preferences.visibleStatuses.length > 0 &&
+		preferences.visibleStatuses.every((status) =>
+			columns.includes(status as (typeof columns)[number]),
+		)
 	);
 }
 
 function TaskBoardSkeleton() {
 	return (
 		<output className="flex flex-col gap-7" aria-label={m.loading()}>
-			<div className="rounded-[1.75rem] bg-card p-8">
+			<div className="border-b pb-6">
 				<Skeleton className="h-4 w-28" />
 				<Skeleton className="mt-10 h-11 w-2/5 min-w-56" />
 				<Skeleton className="mt-4 h-5 w-3/5 min-w-64" />
 			</div>
 			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
 				{columns.map((status) => (
-					<div
-						key={status}
-						className="rounded-2xl border border-border/80 bg-muted/70 p-3"
-					>
+					<div key={status} className="rounded-xl border bg-muted/45 p-3">
 						<Skeleton className="mb-4 h-5 w-24" />
 						<Skeleton className="h-36 rounded-xl" />
 						<Skeleton className="mt-3 h-28 rounded-xl" />
