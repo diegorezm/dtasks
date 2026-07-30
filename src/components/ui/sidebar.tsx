@@ -31,6 +31,15 @@ const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
+type CookieStoreLike = {
+	set: (options: {
+		expires: number;
+		name: string;
+		path: string;
+		value: string;
+	}) => Promise<unknown>;
+};
+
 type SidebarContextProps = {
 	state: "expanded" | "collapsed";
 	open: boolean;
@@ -42,6 +51,29 @@ type SidebarContextProps = {
 };
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null);
+
+function isCookieStoreLike(value: unknown): value is CookieStoreLike {
+	return (
+		typeof value === "object" &&
+		value !== null &&
+		"set" in value &&
+		typeof value.set === "function"
+	);
+}
+
+function persistSidebarState(open: boolean) {
+	const cookieStore = Reflect.get(window, "cookieStore");
+	if (!isCookieStoreLike(cookieStore)) {
+		return;
+	}
+
+	void cookieStore.set({
+		name: SIDEBAR_COOKIE_NAME,
+		value: String(open),
+		path: "/",
+		expires: Date.now() + SIDEBAR_COOKIE_MAX_AGE * 1_000,
+	});
+}
 
 function useSidebar() {
 	const context = React.useContext(SidebarContext);
@@ -81,8 +113,7 @@ function SidebarProvider({
 				_setOpen(openState);
 			}
 
-			// This sets the cookie to keep the sidebar state.
-			document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+			persistSidebarState(openState);
 		},
 		[setOpenProp, open],
 	);
@@ -230,8 +261,8 @@ function Sidebar({
 				className={cn(
 					"fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
 					side === "left"
-						? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
-						: "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
+						? "left-0 group-data-[collapsible=offcanvas]:-left-(--sidebar-width)"
+						: "right-0 group-data-[collapsible=offcanvas]:-right-(--sidebar-width)",
 					// Adjust the padding for floating and inset variants.
 					variant === "floating" || variant === "inset"
 						? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"

@@ -43,7 +43,7 @@ function ProjectBrief({ mode }: Pick<AuthShellProps, "mode">) {
 	return (
 		<section className="relative hidden min-h-screen overflow-hidden bg-secondary lg:flex lg:flex-col lg:justify-between lg:p-10 xl:p-14">
 			<div
-				className="pointer-events-none absolute -right-32 -top-32 size-96 rounded-full border-[72px] border-background/40"
+				className="pointer-events-none absolute -right-32 -top-32 size-96 rounded-full border-72 border-background/40"
 				aria-hidden="true"
 			/>
 			<Link
