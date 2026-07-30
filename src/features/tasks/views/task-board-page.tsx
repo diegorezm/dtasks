@@ -230,7 +230,12 @@ export function TaskBoardPage({
 			<section aria-label={m.task_board_label()}>
 				{view === "board" ? (
 					<div className="-mx-1 overflow-x-auto px-1 pb-5">
-						<div className="grid min-w-max grid-flow-col auto-cols-[minmax(17rem,1fr)] gap-3 xl:grid-flow-row xl:grid-cols-5">
+						<div
+							className="grid min-w-max gap-3 xl:min-w-0"
+							style={{
+								gridTemplateColumns: `repeat(${visibleStatuses.length}, minmax(17rem, 1fr))`,
+							}}
+						>
 							{columns
 								.filter((status) => visibleStatuses.includes(status))
 								.map((status, columnIndex) => (
