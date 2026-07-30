@@ -15,7 +15,6 @@ import {
 	Card,
 	CardContent,
 	CardDescription,
-	CardHeader,
 	CardTitle,
 } from "#/components/ui/card";
 import {
@@ -39,7 +38,12 @@ import { routeParamId } from "#/core/convex/id";
 import { m } from "#/paraglide/messages";
 import { api } from "../../../../convex/_generated/api";
 
-const projectAccents = ["bg-primary", "bg-chart-2", "bg-chart-3", "bg-chart-4"];
+const projectAccents = [
+	{ bar: "bg-primary", tint: "bg-primary/10", text: "text-primary" },
+	{ bar: "bg-chart-2", tint: "bg-chart-2/10", text: "text-chart-2" },
+	{ bar: "bg-chart-3", tint: "bg-chart-3/10", text: "text-chart-3" },
+	{ bar: "bg-chart-4", tint: "bg-chart-4/10", text: "text-chart-4" },
+];
 
 export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 	const context = useRouteContext({ from: "__root__" });
@@ -208,68 +212,67 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 					</CardContent>
 				</Card>
 			) : (
-				<div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-					{projectList.map((project, index) => (
-						<Card
-							key={project._id}
-							className="group relative overflow-hidden rounded-xl border-border/70 bg-card shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
-						>
-							<div
-								className={`h-1 ${projectAccents[index % projectAccents.length]}`}
-							/>
-							<CardHeader className="gap-5 pb-4">
-								<div className="flex items-start justify-between gap-3">
-									<div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
-										<FolderKanbanIcon className="size-5" aria-hidden="true" />
-									</div>
-									<ArrowUpRightIcon
-										className="size-4 text-muted-foreground/60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground"
-										aria-hidden="true"
-									/>
+				<div className="overflow-hidden border-y border-border/70">
+					{projectList.map((project, index) => {
+						const accent = projectAccents[index % projectAccents.length];
+						return (
+							<article
+								key={project._id}
+								className="group relative grid gap-5 px-2 py-5 transition-colors before:absolute before:inset-y-4 before:left-0 before:w-0.5 before:rounded-full before:bg-transparent hover:bg-primary/5 hover:before:bg-primary md:grid-cols-[3.5rem_minmax(0,1.35fr)_minmax(12rem,0.8fr)_auto] md:items-center md:px-4"
+							>
+								<div
+									className={`flex size-11 shrink-0 items-center justify-center rounded-full ${accent.tint} ${accent.text}`}
+								>
+									<span className="font-mono text-xs font-semibold">
+										{String(index + 1).padStart(2, "0")}
+									</span>
 								</div>
-								<div className="space-y-1.5">
-									<CardTitle className="truncate text-lg">
+								<div className="min-w-0 space-y-1">
+									<h2 className="truncate font-serif text-xl font-semibold tracking-[-0.02em]">
 										<Link
 											to="/dashboard/$workspaceId/projects/$projectId"
 											params={{ workspaceId, projectId: project._id }}
-											className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+											className="inline-flex max-w-full items-center gap-2 rounded-sm transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 										>
-											{project.name}
+											<span className="truncate underline-offset-4 group-hover:underline group-focus-within:underline">
+												{project.name}
+											</span>
+											<ArrowUpRightIcon
+												className="size-4 shrink-0 text-primary opacity-60 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
+												aria-hidden="true"
+											/>
 										</Link>
-									</CardTitle>
-									<CardDescription className="line-clamp-2 min-h-10">
+									</h2>
+									<p className="line-clamp-2 text-sm text-muted-foreground">
 										{project.description || m.projects_empty()}
-									</CardDescription>
+									</p>
 								</div>
-							</CardHeader>
-							<CardContent className="space-y-5">
-								<div className="space-y-2">
+								<div className="min-w-0 space-y-2">
 									<div className="flex items-center justify-between gap-3 font-mono text-xs">
 										<span className="text-muted-foreground">
 											{m.project_progress({ progress: project.completion })}
 										</span>
-										<span className="font-semibold text-foreground">
-											{project.completion}%
-										</span>
+										<span className="font-semibold">{project.completion}%</span>
 									</div>
-									<div className="h-1.5 overflow-hidden rounded-full bg-muted">
+									<div className="h-1 overflow-hidden rounded-full bg-muted">
 										<div
-											className={`h-full rounded-full ${projectAccents[index % projectAccents.length]} transition-[width]`}
+											className={`h-full ${accent.bar} transition-[width]`}
 											style={{ width: `${project.completion}%` }}
 										/>
 									</div>
 								</div>
-								<div className="flex items-center justify-between gap-3 border-t border-border/60 pt-4">
-									<span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-										<CheckCircle2Icon className="size-4" aria-hidden="true" />
+								<div className="flex flex-wrap items-center justify-between gap-3 md:justify-end">
+									<span className="flex items-center gap-1.5 whitespace-nowrap font-mono text-xs text-muted-foreground">
+										<CheckCircle2Icon className="size-3.5" aria-hidden="true" />
 										{project.taskCount} {m.tasks()}
 									</span>
+
 									{members.data?.find((member) => member.id === user._id)
 										?.role === "owner" ? (
 										<Button
 											size="sm"
 											variant="ghost"
-											className="text-muted-foreground hover:text-destructive"
+											className="justify-self-start text-muted-foreground hover:text-destructive md:justify-self-end"
 											disabled={archive.isPending}
 											onClick={() =>
 												archive.mutate(
@@ -283,9 +286,9 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 										</Button>
 									) : null}
 								</div>
-							</CardContent>
-						</Card>
-					))}
+							</article>
+						);
+					})}
 				</div>
 			)}
 		</div>
