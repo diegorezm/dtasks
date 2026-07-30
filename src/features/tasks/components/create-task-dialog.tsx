@@ -1,3 +1,4 @@
+import { LoaderCircleIcon } from "lucide-react";
 import { type FormEvent, type ReactNode, useState } from "react";
 import { Button } from "#/components/ui/button";
 import {
@@ -51,9 +52,11 @@ export function CreateTaskDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>{children}</DialogTrigger>
-			<DialogContent>
+			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
-					<DialogTitle>{m.task_create()}</DialogTitle>
+					<DialogTitle className="text-2xl tracking-[-0.03em]">
+						{m.task_create()}
+					</DialogTitle>
 				</DialogHeader>
 				<form onSubmit={handleSubmit}>
 					<FieldGroup>
@@ -110,7 +113,17 @@ export function CreateTaskDialog({
 							<FieldLabel htmlFor="due-date">{m.task_due_date()}</FieldLabel>
 							<Input id="due-date" name="dueDate" type="date" />
 						</Field>
-						<Button type="submit" disabled={isPending}>
+						<Button
+							type="submit"
+							className="mt-2 transition-transform active:scale-[0.98]"
+							disabled={isPending}
+						>
+							{isPending ? (
+								<LoaderCircleIcon
+									data-icon="inline-start"
+									className="animate-spin"
+								/>
+							) : null}
 							{m.task_save()}
 						</Button>
 					</FieldGroup>

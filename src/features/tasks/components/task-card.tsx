@@ -4,9 +4,10 @@ import {
 	ChevronRightIcon,
 	FlagIcon,
 	GripVerticalIcon,
+	Trash2Icon,
 } from "lucide-react";
 import type { DragEvent } from "react";
-import { Avatar, AvatarFallback } from "#/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
@@ -20,11 +21,10 @@ import {
 } from "./task-board-types";
 
 const priorityStyles: Record<Task["priority"], string> = {
-	none: "border-border bg-muted text-muted-foreground",
-	low: "border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300",
-	medium:
-		"border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-300",
-	high: "border-rose-500/20 bg-rose-500/10 text-rose-700 dark:text-rose-300",
+	none: "",
+	low: "opacity-60",
+	medium: "opacity-80",
+	high: "",
 };
 
 type TaskCardProps = {
@@ -65,49 +65,52 @@ export function TaskCard({
 			onDragEnd={onDragEnd}
 			onDragStart={(event) => onDragStart(event, task._id)}
 			className={cn(
-				"group gap-0 rounded-lg border-border py-0 shadow-sm transition-[transform,box-shadow,opacity] hover:-translate-y-0.5 hover:shadow-md",
+				"group gap-0 rounded-xl border-0 py-0 shadow-[0_1px_2px_hsl(var(--foreground)/0.05),0_8px_24px_-20px_hsl(var(--foreground)/0.5)] transition-[transform,box-shadow,opacity] duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_3px_hsl(var(--foreground)/0.06),0_14px_30px_-18px_hsl(var(--foreground)/0.45)]",
 				isDragging && "scale-[0.98] opacity-45",
 				!archived && "cursor-grab active:cursor-grabbing",
 			)}
 		>
-			<CardContent className="flex flex-col gap-3 p-3.5">
-				<div className="flex items-start gap-2">
+			<CardContent className="flex flex-col gap-3.5 p-4">
+				<div className="flex items-start gap-2.5">
 					<GripVerticalIcon
-						className="mt-0.5 size-4 shrink-0 text-muted-foreground/50 group-hover:text-muted-foreground"
+						className="mt-0.5 size-4 shrink-0 text-muted-foreground/30 transition-colors group-hover:text-muted-foreground"
 						aria-hidden="true"
 					/>
-					<p className="min-w-0 flex-1 text-sm font-semibold leading-5">
+					<p className="min-w-0 flex-1 text-pretty text-sm font-semibold leading-5 tracking-[-0.01em]">
 						{task.title}
 					</p>
 				</div>
 				{task.description ? (
-					<p className="line-clamp-2 text-xs leading-5 text-muted-foreground">
+					<p className="line-clamp-2 pl-6.5 text-xs leading-5 text-muted-foreground">
 						{task.description}
 					</p>
 				) : null}
-				<div className="flex flex-wrap items-center gap-1.5">
+				<div className="flex flex-wrap items-center gap-2 pl-6.5">
 					{task.priority !== "none" ? (
 						<Badge
 							className={cn(
-								"gap-1 border text-[10px] font-semibold",
+								"gap-1 rounded-md border-0 bg-primary/10 text-[10px] font-semibold text-primary",
 								priorityStyles[task.priority],
 							)}
-							variant="outline"
+							variant="secondary"
 						>
 							<FlagIcon className="size-3" />
 							{m[`priority_${task.priority}` as "priority_low"]()}
 						</Badge>
 					) : null}
 					{task.dueDate ? (
-						<span className="inline-flex items-center gap-1 font-mono text-[10px] text-muted-foreground">
+						<span className="inline-flex items-center gap-1 font-mono text-[10px] tabular-nums text-muted-foreground">
 							<CalendarDaysIcon className="size-3" />
 							{formatDueDate(task.dueDate)}
 						</span>
 					) : null}
 				</div>
-				<div className="flex min-h-6 items-center justify-between">
+				<div className="flex min-h-7 items-center justify-between border-t pt-3">
 					{assignee ? (
-						<Avatar size="sm" title={assignee}>
+						<Avatar className="rounded-lg" size="sm" title={assignee}>
+							{member.image ? (
+								<AvatarImage src={member.image} alt={assignee} />
+							) : null}
 							<AvatarFallback>{initials(assignee)}</AvatarFallback>
 						</Avatar>
 					) : (
@@ -126,13 +129,14 @@ export function TaskCard({
 							<ChevronLeftIcon />
 						</Button>
 						<Button
-							size="sm"
+							aria-label={m.task_delete()}
+							size="icon-sm"
 							variant="ghost"
-							className="px-2 text-xs text-muted-foreground hover:text-destructive"
+							className="text-muted-foreground hover:text-destructive"
 							disabled={archived || isRemoving}
 							onClick={() => onRemove(task._id)}
 						>
-							{m.task_delete()}
+							<Trash2Icon />
 						</Button>
 						<Button
 							aria-label={nextStatus ? label(nextStatus) : label(task.status)}
