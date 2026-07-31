@@ -38,7 +38,11 @@ export function DashboardLayout({
 }) {
 	return (
 		<SidebarProvider>
-			<DashboardSidebar user={user} workspaceName={workspaceName} />
+			<DashboardSidebar
+				user={user}
+				workspaceId={workspaceId}
+				workspaceName={workspaceName}
+			/>
 			<SidebarInset>
 				<header className="flex h-16 items-center gap-3 border-b px-4">
 					<SidebarTrigger />

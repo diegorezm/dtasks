@@ -7,7 +7,7 @@ export const Route = createFileRoute("/__private/dashboard/")({
 			context.convexQueryClient.queryOptions(api.workspaces.listMine, {}),
 		);
 		throw redirect({
-			to: workspaces[0] ? "/dashboard/$workspaceId/projects" : "/onboarding",
+			to: workspaces[0] ? "/dashboard/$workspaceId" : "/onboarding",
 			params: workspaces[0] ? { workspaceId: workspaces[0]._id } : {},
 		});
 	},

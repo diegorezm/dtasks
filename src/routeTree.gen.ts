@@ -19,6 +19,7 @@ import { Route as _privateDashboardIndexRouteImport } from './routes/__private/d
 import { Route as _privateDashboardWorkspaceIdRouteImport } from './routes/__private/dashboard/$workspaceId'
 import { Route as _publicInviteInvitationIdRouteImport } from './routes/__public/invite/$invitationId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as _privateDashboardWorkspaceIdIndexRouteImport } from './routes/__private/dashboard/$workspaceId/index'
 import { Route as _privateDashboardWorkspaceIdProjectsIndexRouteImport } from './routes/__private/dashboard/$workspaceId/projects/index'
 import { Route as _privateDashboardWorkspaceIdProjectsProjectIdRouteImport } from './routes/__private/dashboard/$workspaceId/projects/$projectId'
 
@@ -72,6 +73,12 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const _privateDashboardWorkspaceIdIndexRoute =
+  _privateDashboardWorkspaceIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => _privateDashboardWorkspaceIdRoute,
+  } as any)
 const _privateDashboardWorkspaceIdProjectsIndexRoute =
   _privateDashboardWorkspaceIdProjectsIndexRouteImport.update({
     id: '/projects/',
@@ -94,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/invite/$invitationId': typeof _publicInviteInvitationIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard/': typeof _privateDashboardIndexRoute
+  '/dashboard/$workspaceId/': typeof _privateDashboardWorkspaceIdIndexRoute
   '/dashboard/$workspaceId/projects/$projectId': typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
   '/dashboard/$workspaceId/projects/': typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
@@ -102,10 +110,10 @@ export interface FileRoutesByTo {
   '/onboarding': typeof _privateOnboardingRoute
   '/sign-in': typeof _publicSignInRoute
   '/sign-up': typeof _publicSignUpRoute
-  '/dashboard/$workspaceId': typeof _privateDashboardWorkspaceIdRouteWithChildren
   '/invite/$invitationId': typeof _publicInviteInvitationIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/dashboard': typeof _privateDashboardIndexRoute
+  '/dashboard/$workspaceId': typeof _privateDashboardWorkspaceIdIndexRoute
   '/dashboard/$workspaceId/projects/$projectId': typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
   '/dashboard/$workspaceId/projects': typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/__public/invite/$invitationId': typeof _publicInviteInvitationIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/__private/dashboard/': typeof _privateDashboardIndexRoute
+  '/__private/dashboard/$workspaceId/': typeof _privateDashboardWorkspaceIdIndexRoute
   '/__private/dashboard/$workspaceId/projects/$projectId': typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
   '/__private/dashboard/$workspaceId/projects/': typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
@@ -135,6 +144,7 @@ export interface FileRouteTypes {
     | '/invite/$invitationId'
     | '/api/auth/$'
     | '/dashboard/'
+    | '/dashboard/$workspaceId/'
     | '/dashboard/$workspaceId/projects/$projectId'
     | '/dashboard/$workspaceId/projects/'
   fileRoutesByTo: FileRoutesByTo
@@ -143,10 +153,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/sign-in'
     | '/sign-up'
-    | '/dashboard/$workspaceId'
     | '/invite/$invitationId'
     | '/api/auth/$'
     | '/dashboard'
+    | '/dashboard/$workspaceId'
     | '/dashboard/$workspaceId/projects/$projectId'
     | '/dashboard/$workspaceId/projects'
   id:
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
     | '/__public/invite/$invitationId'
     | '/api/auth/$'
     | '/__private/dashboard/'
+    | '/__private/dashboard/$workspaceId/'
     | '/__private/dashboard/$workspaceId/projects/$projectId'
     | '/__private/dashboard/$workspaceId/projects/'
   fileRoutesById: FileRoutesById
@@ -243,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/__private/dashboard/$workspaceId/': {
+      id: '/__private/dashboard/$workspaceId/'
+      path: '/'
+      fullPath: '/dashboard/$workspaceId/'
+      preLoaderRoute: typeof _privateDashboardWorkspaceIdIndexRouteImport
+      parentRoute: typeof _privateDashboardWorkspaceIdRoute
+    }
     '/__private/dashboard/$workspaceId/projects/': {
       id: '/__private/dashboard/$workspaceId/projects/'
       path: '/projects'
@@ -261,12 +279,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface _privateDashboardWorkspaceIdRouteChildren {
+  _privateDashboardWorkspaceIdIndexRoute: typeof _privateDashboardWorkspaceIdIndexRoute
   _privateDashboardWorkspaceIdProjectsProjectIdRoute: typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
   _privateDashboardWorkspaceIdProjectsIndexRoute: typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
 
 const _privateDashboardWorkspaceIdRouteChildren: _privateDashboardWorkspaceIdRouteChildren =
   {
+    _privateDashboardWorkspaceIdIndexRoute:
+      _privateDashboardWorkspaceIdIndexRoute,
     _privateDashboardWorkspaceIdProjectsProjectIdRoute:
       _privateDashboardWorkspaceIdProjectsProjectIdRoute,
     _privateDashboardWorkspaceIdProjectsIndexRoute:
