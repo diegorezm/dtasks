@@ -20,6 +20,7 @@ import {
 	TaskBoardViewControls,
 } from "../components/task-board-view-controls";
 import { TaskListView } from "../components/task-list-view";
+import { useTaskCreateStore } from "../hooks/use-task-create-store";
 
 export function TaskBoardPage({
 	workspaceId,
@@ -69,7 +70,14 @@ export function TaskBoardPage({
 		...columns,
 	]);
 	const [preferencesReady, setPreferencesReady] = useState(false);
+	const createStatus = useTaskCreateStore((state) => state.status);
+	const openTaskCreate = useTaskCreateStore((state) => state.openForStatus);
 	const preferenceKey = `dtasks:task-view:${workspaceId}:${projectId}`;
+	const latestProjectKey = `dtasks:latest-project:${workspaceId}`;
+
+	useEffect(() => {
+		if (project.data) localStorage.setItem(latestProjectKey, projectId);
+	}, [latestProjectKey, project.data, projectId]);
 
 	useEffect(() => {
 		try {
@@ -105,6 +113,7 @@ export function TaskBoardPage({
 				priority: priorityFromForm(form.get("priority")),
 				assigneeId: String(form.get("assignee") || "") || undefined,
 				dueDate: String(form.get("dueDate") || "") || undefined,
+				status: createStatus,
 			},
 			{
 				onError: () => setActionError(m.error_generic()),
@@ -182,15 +191,14 @@ export function TaskBoardPage({
 				completed={completed}
 				total={taskList.length}
 			>
-				<CreateTaskDialog
-					members={members.data ?? []}
-					isPending={create.isPending}
-					error={actionError}
-					onSubmit={createTask}
-				>
-					<CreateTaskTrigger />
-				</CreateTaskDialog>
+				<CreateTaskTrigger onClick={() => openTaskCreate("backlog")} />
 			</TaskBoardHeader>
+			<CreateTaskDialog
+				members={members.data ?? []}
+				isPending={create.isPending}
+				error={actionError}
+				onSubmit={createTask}
+			/>
 
 			{actionError ? (
 				<p
@@ -238,11 +246,10 @@ export function TaskBoardPage({
 						>
 							{columns
 								.filter((status) => visibleStatuses.includes(status))
-								.map((status, columnIndex) => (
+								.map((status) => (
 									<TaskBoardColumn
 										key={status}
 										status={status}
-										columnIndex={columnIndex}
 										tasks={filteredTasks.filter(
 											(task) => task.status === status,
 										)}
@@ -252,7 +259,6 @@ export function TaskBoardPage({
 											overStatus === status && draggedTaskId !== undefined
 										}
 										draggedTaskId={draggedTaskId}
-										isMoving={move.isPending}
 										isRemoving={remove.isPending}
 										onDragEnter={(event, laneStatus) => {
 											if (!archived && draggedTaskId) {
@@ -272,12 +278,7 @@ export function TaskBoardPage({
 											setDraggedTaskId(undefined);
 											setOverStatus(undefined);
 										}}
-										onMove={(taskId, status) =>
-											move.mutate(
-												{ taskId, status },
-												{ onError: () => setActionError(m.error_generic()) },
-											)
-										}
+										onAddTask={openTaskCreate}
 										onRemove={(taskId) => {
 											if (window.confirm(m.task_delete_confirm()))
 												remove.mutate(

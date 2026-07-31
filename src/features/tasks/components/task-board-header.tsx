@@ -78,11 +78,12 @@ export function TaskBoardHeader({
 	);
 }
 
-export function CreateTaskTrigger() {
+export function CreateTaskTrigger({ onClick }: { onClick: () => void }) {
 	return (
 		<Button
 			type="button"
 			className="shrink-0 transition-transform active:scale-[0.98]"
+			onClick={onClick}
 		>
 			<PlusIcon data-icon="inline-start" />
 			{m.task_create()}

@@ -1,4 +1,6 @@
+import { PlusIcon } from "lucide-react";
 import type { DragEvent } from "react";
+import { Button } from "#/components/ui/button";
 import { cn } from "#/lib/utils";
 import { m } from "#/paraglide/messages";
 import {
@@ -11,40 +13,36 @@ import { TaskCard } from "./task-card";
 
 type TaskBoardColumnProps = {
 	status: TaskStatus;
-	columnIndex: number;
 	tasks: Task[];
 	members: WorkspaceMember[];
 	archived: boolean;
 	isDropTarget: boolean;
 	draggedTaskId?: string;
-	isMoving: boolean;
 	isRemoving: boolean;
 	onDragEnter: (event: DragEvent<HTMLElement>, status: TaskStatus) => void;
 	onDragOver: (event: DragEvent<HTMLElement>) => void;
 	onDrop: (event: DragEvent<HTMLElement>, status: TaskStatus) => void;
 	onDragStart: (event: DragEvent<HTMLElement>, taskId: string) => void;
 	onDragEnd: () => void;
-	onMove: (taskId: Task["_id"], status: TaskStatus) => void;
 	onRemove: (taskId: Task["_id"]) => void;
+	onAddTask: (status: TaskStatus) => void;
 };
 
 export function TaskBoardColumn({
 	status,
-	columnIndex,
 	tasks,
 	members,
 	archived,
 	isDropTarget,
 	draggedTaskId,
-	isMoving,
 	isRemoving,
 	onDragEnter,
 	onDragOver,
 	onDrop,
 	onDragStart,
 	onDragEnd,
-	onMove,
 	onRemove,
+	onAddTask,
 }: TaskBoardColumnProps) {
 	return (
 		<section
@@ -67,9 +65,22 @@ export function TaskBoardColumn({
 						{label(status)}
 					</h2>
 				</div>
-				<span className="font-mono text-[11px] tabular-nums text-muted-foreground">
-					{tasks.length}
-				</span>
+				<div className="flex items-center gap-1">
+					<span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+						{tasks.length}
+					</span>
+					{!archived ? (
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon-xs"
+							aria-label={m.task_create()}
+							onClick={() => onAddTask(status)}
+						>
+							<PlusIcon />
+						</Button>
+					) : null}
+				</div>
 			</header>
 			<div className="flex flex-1 flex-col gap-2.5">
 				{tasks.map((task) => (
@@ -77,14 +88,11 @@ export function TaskBoardColumn({
 						key={task._id}
 						task={task}
 						members={members}
-						columnIndex={columnIndex}
 						archived={archived}
 						isDragging={draggedTaskId === task._id}
-						isMoving={isMoving}
 						isRemoving={isRemoving}
 						onDragStart={onDragStart}
 						onDragEnd={onDragEnd}
-						onMove={onMove}
 						onRemove={onRemove}
 					/>
 				))}

@@ -1,21 +1,10 @@
-import {
-	CalendarDaysIcon,
-	ChevronLeftIcon,
-	ChevronRightIcon,
-	FlagIcon,
-	Trash2Icon,
-} from "lucide-react";
+import { CalendarDaysIcon, FlagIcon, Trash2Icon } from "lucide-react";
 import type { DragEvent } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
 import { Button } from "#/components/ui/button";
 import { cn } from "#/lib/utils";
 import { m } from "#/paraglide/messages";
-import {
-	columns,
-	type Task,
-	type TaskStatus,
-	type WorkspaceMember,
-} from "./task-board-types";
+import type { Task, WorkspaceMember } from "./task-board-types";
 
 const priorityStyles: Record<Task["priority"], string> = {
 	none: "text-muted-foreground",
@@ -34,34 +23,26 @@ const priorityRails: Record<Task["priority"], string> = {
 type TaskCardProps = {
 	task: Task;
 	members: WorkspaceMember[];
-	columnIndex: number;
 	archived: boolean;
 	isDragging: boolean;
-	isMoving: boolean;
 	isRemoving: boolean;
 	onDragStart: (event: DragEvent<HTMLElement>, taskId: string) => void;
 	onDragEnd: () => void;
-	onMove: (taskId: Task["_id"], status: TaskStatus) => void;
 	onRemove: (taskId: Task["_id"]) => void;
 };
 
 export function TaskCard({
 	task,
 	members,
-	columnIndex,
 	archived,
 	isDragging,
-	isMoving,
 	isRemoving,
 	onDragStart,
 	onDragEnd,
-	onMove,
 	onRemove,
 }: TaskCardProps) {
 	const member = members.find((item) => item.id === task.assigneeId);
 	const assignee = member?.name || member?.email;
-	const previousStatus = columns[columnIndex - 1];
-	const nextStatus = columns[columnIndex + 1];
 
 	return (
 		<article
@@ -112,38 +93,16 @@ export function TaskCard({
 						</span>
 					) : null}
 				</div>
-				<div className="absolute right-2 top-2 flex items-center rounded-md border bg-card opacity-0 shadow-sm transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-					<Button
-						aria-label={
-							previousStatus ? label(previousStatus) : label(task.status)
-						}
-						size="icon-sm"
-						variant="ghost"
-						disabled={archived || !previousStatus || isMoving}
-						onClick={() => previousStatus && onMove(task._id, previousStatus)}
-					>
-						<ChevronLeftIcon />
-					</Button>
-					<Button
-						aria-label={m.task_delete()}
-						size="icon-sm"
-						variant="ghost"
-						className="text-muted-foreground hover:text-destructive"
-						disabled={archived || isRemoving}
-						onClick={() => onRemove(task._id)}
-					>
-						<Trash2Icon />
-					</Button>
-					<Button
-						aria-label={nextStatus ? label(nextStatus) : label(task.status)}
-						size="icon-sm"
-						variant="ghost"
-						disabled={archived || !nextStatus || isMoving}
-						onClick={() => nextStatus && onMove(task._id, nextStatus)}
-					>
-						<ChevronRightIcon />
-					</Button>
-				</div>
+				<Button
+					aria-label={m.task_delete()}
+					size="icon-xs"
+					variant="ghost"
+					className="absolute right-2 top-2 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100 group-focus-within:opacity-100"
+					disabled={archived || isRemoving}
+					onClick={() => onRemove(task._id)}
+				>
+					<Trash2Icon />
+				</Button>
 			</div>
 		</article>
 	);
@@ -162,8 +121,4 @@ function initials(name: string) {
 		.map((part) => part[0])
 		.join("")
 		.toUpperCase();
-}
-
-function label(status: TaskStatus) {
-	return m[`status_${status}`]();
 }
