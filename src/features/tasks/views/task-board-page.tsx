@@ -5,6 +5,7 @@ import type { DragEvent } from "react";
 import { useEffect, useState } from "react";
 import { Skeleton } from "#/components/ui/skeleton";
 import { routeParamId } from "#/core/convex/id";
+import { rememberRecentProject } from "#/core/project-preferences";
 import { m } from "#/paraglide/messages";
 import { api } from "../../../../convex/_generated/api";
 import { CreateTaskDialog } from "../components/create-task-dialog";
@@ -73,11 +74,10 @@ export function TaskBoardPage({
 	const createStatus = useTaskCreateStore((state) => state.status);
 	const openTaskCreate = useTaskCreateStore((state) => state.openForStatus);
 	const preferenceKey = `dtasks:task-view:${workspaceId}:${projectId}`;
-	const latestProjectKey = `dtasks:latest-project:${workspaceId}`;
 
 	useEffect(() => {
-		if (project.data) localStorage.setItem(latestProjectKey, projectId);
-	}, [latestProjectKey, project.data, projectId]);
+		if (project.data) rememberRecentProject(workspaceId, projectId);
+	}, [project.data, projectId, workspaceId]);
 
 	useEffect(() => {
 		try {

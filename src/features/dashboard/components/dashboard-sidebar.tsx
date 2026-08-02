@@ -1,4 +1,10 @@
-import { Link, useMatch, useRouterState } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import {
+	Link,
+	useMatch,
+	useRouteContext,
+	useRouterState,
+} from "@tanstack/react-router";
 import {
 	BellIcon,
 	ChartNoAxesColumnIncreasingIcon,
@@ -7,6 +13,7 @@ import {
 	LayoutDashboardIcon,
 	LogOutIcon,
 	MessageSquareTextIcon,
+	MoreHorizontalIcon,
 	Settings2Icon,
 	UsersIcon,
 } from "lucide-react";
@@ -25,8 +32,11 @@ import {
 	SidebarMenuItem,
 	SidebarRail,
 } from "#/components/ui/sidebar";
+import { routeParamId } from "#/core/convex/id";
+import { readRecentProjectIds } from "#/core/project-preferences";
 import { authClient } from "#/features/auth/auth-client";
 import { m } from "#/paraglide/messages";
+import { api } from "../../../../convex/_generated/api";
 
 type DashboardSidebarProps = {
 	user: { name?: string | null; email: string; image?: string | null };
@@ -46,10 +56,6 @@ const secondaryNavigation = [
 	{ label: m.dashboard_nav_help, icon: CircleHelpIcon },
 ];
 
-function latestProjectKey(workspaceId: string) {
-	return `dtasks:latest-project:${workspaceId}`;
-}
-
 const activeClass =
 	"relative h-10 rounded-lg px-3 text-sidebar-foreground/70 data-[active=true]:font-semibold data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-sm data-[active=true]:before:absolute data-[active=true]:before:inset-y-2 data-[active=true]:before:left-0 data-[active=true]:before:w-0.5 data-[active=true]:before:rounded-full data-[active=true]:before:bg-primary";
 
@@ -61,6 +67,12 @@ export function DashboardSidebar({
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
+	const { convexQueryClient } = useRouteContext({ from: "__root__" });
+	const projects = useQuery(
+		convexQueryClient.queryOptions(api.projects.list, {
+			workspaceId: routeParamId<"workspaces">(workspaceId),
+		}),
+	);
 	const overviewMatch = useMatch({
 		from: "/__private/dashboard/$workspaceId/",
 		shouldThrow: false,
@@ -73,16 +85,20 @@ export function DashboardSidebar({
 		from: "/__private/dashboard/$workspaceId/projects/$projectId",
 		shouldThrow: false,
 	});
-	const [latestProjectId, setLatestProjectId] = useState<string>();
+	const [recentProjectIds, setRecentProjectIds] = useState<string[]>([]);
 
 	useEffect(() => {
 		if (!pathname) return;
-		setLatestProjectId(
-			localStorage.getItem(latestProjectKey(workspaceId)) ?? undefined,
-		);
+		setRecentProjectIds(readRecentProjectIds(workspaceId));
 	}, [pathname, workspaceId]);
 
-	const projectTarget = projectMatch?.params.projectId ?? latestProjectId;
+	const recentProjects = recentProjectIds
+		.map((projectId) =>
+			projects.data?.find((project) => project._id === projectId),
+		)
+		.filter((project): project is NonNullable<typeof project> =>
+			Boolean(project),
+		);
 	const initials = (user.name || user.email)
 		.split(" ")
 		.map((part) => part[0])
@@ -122,30 +138,6 @@ export function DashboardSidebar({
 									</Link>
 								</SidebarMenuButton>
 							</SidebarMenuItem>
-							<SidebarMenuItem>
-								<SidebarMenuButton
-									asChild
-									isActive={Boolean(projectListMatch || projectMatch)}
-									tooltip={m.dashboard_nav_projects()}
-									className={activeClass}
-								>
-									<Link
-										to={
-											projectTarget
-												? "/dashboard/$workspaceId/projects/$projectId"
-												: "/dashboard/$workspaceId/projects"
-										}
-										params={
-											projectTarget
-												? { workspaceId, projectId: projectTarget }
-												: { workspaceId }
-										}
-									>
-										<FolderKanbanIcon />
-										<span>{m.dashboard_nav_projects()}</span>
-									</Link>
-								</SidebarMenuButton>
-							</SidebarMenuItem>
 							{primaryNavigation.map((item) => (
 								<SidebarMenuItem key={item.label()}>
 									<SidebarMenuButton
@@ -164,6 +156,42 @@ export function DashboardSidebar({
 							))}
 						</SidebarMenu>
 					</SidebarGroupContent>
+				</SidebarGroup>
+				<SidebarGroup className="group-data-[collapsible=icon]:hidden">
+					<SidebarGroupLabel>{m.dashboard_nav_projects()}</SidebarGroupLabel>
+					<SidebarMenu>
+						{recentProjects.map((project) => (
+							<SidebarMenuItem key={project._id}>
+								<SidebarMenuButton
+									asChild
+									isActive={projectMatch?.params.projectId === project._id}
+								>
+									<Link
+										to="/dashboard/$workspaceId/projects/$projectId"
+										params={{ workspaceId, projectId: project._id }}
+									>
+										<FolderKanbanIcon />
+										<span>{project.name}</span>
+									</Link>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						))}
+						<SidebarMenuItem>
+							<SidebarMenuButton
+								asChild
+								isActive={Boolean(projectListMatch)}
+								className="text-sidebar-foreground/70"
+							>
+								<Link
+									to="/dashboard/$workspaceId/projects"
+									params={{ workspaceId }}
+								>
+									<MoreHorizontalIcon />
+									<span>{m.dashboard_nav_more()}</span>
+								</Link>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
+					</SidebarMenu>
 				</SidebarGroup>
 				<SidebarGroup className="mt-auto px-0 py-2">
 					<SidebarGroupLabel className="px-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-sidebar-foreground/45 group-data-[collapsible=icon]:hidden">
