@@ -35,6 +35,7 @@ import { Input } from "#/components/ui/input";
 import { Skeleton } from "#/components/ui/skeleton";
 import { Textarea } from "#/components/ui/textarea";
 import { routeParamId } from "#/core/convex/id";
+import { useWorkspaceAccess } from "#/features/workspaces/workspace-access";
 import { m } from "#/paraglide/messages";
 import { api } from "../../../../convex/_generated/api";
 
@@ -47,7 +48,7 @@ const projectAccents = [
 
 export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 	const context = useRouteContext({ from: "__root__" });
-	const { user } = useRouteContext({ from: "/__private" });
+	const { can } = useWorkspaceAccess();
 	const projects = useQuery(
 		context.convexQueryClient.queryOptions(api.projects.list, {
 			workspaceId: routeParamId<"workspaces">(workspaceId),
@@ -55,11 +56,6 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 	);
 	const workspace = useQuery(
 		context.convexQueryClient.queryOptions(api.workspaces.get, {
-			workspaceId: routeParamId<"workspaces">(workspaceId),
-		}),
-	);
-	const members = useQuery(
-		context.convexQueryClient.queryOptions(api.workspaces.listMembers, {
 			workspaceId: routeParamId<"workspaces">(workspaceId),
 		}),
 	);
@@ -92,7 +88,7 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 			},
 		);
 	}
-	if (projects.isLoading || workspace.isLoading || members.isLoading)
+	if (projects.isLoading || workspace.isLoading)
 		return (
 			<div className="flex flex-col gap-8">
 				<div className="space-y-3">
@@ -127,55 +123,57 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 						</span>
 					</div>
 				</div>
-				<Dialog
-					open={open}
-					onOpenChange={(nextOpen) => {
-						setOpen(nextOpen);
-						if (!nextOpen) setActionError(undefined);
-					}}
-				>
-					<DialogTrigger asChild>
-						<Button className="rounded-lg shadow-sm">
-							<PlusIcon data-icon="inline-start" />
-							{m.project_create()}
-						</Button>
-					</DialogTrigger>
-					<DialogContent>
-						<DialogHeader>
-							<DialogTitle>{m.project_create()}</DialogTitle>
-							<DialogDescription>{workspace.data.name}</DialogDescription>
-						</DialogHeader>
-						<form onSubmit={submit}>
-							<FieldGroup>
-								<Field data-invalid={Boolean(actionError) || undefined}>
-									<FieldLabel htmlFor="project-name">
-										{m.project_name()}
-									</FieldLabel>
-									<Input
-										id="project-name"
-										name="name"
-										required
-										maxLength={120}
-									/>
-								</Field>
-								<Field>
-									<FieldLabel htmlFor="project-description">
-										{m.project_description()}
-									</FieldLabel>
-									<Textarea
-										id="project-description"
-										name="description"
-										maxLength={2000}
-									/>
-								</Field>
-								{actionError ? <FieldError>{actionError}</FieldError> : null}
-								<Button disabled={create.isPending} type="submit">
-									{m.project_create_submit()}
-								</Button>
-							</FieldGroup>
-						</form>
-					</DialogContent>
-				</Dialog>
+				{can("projects.create") ? (
+					<Dialog
+						open={open}
+						onOpenChange={(nextOpen) => {
+							setOpen(nextOpen);
+							if (!nextOpen) setActionError(undefined);
+						}}
+					>
+						<DialogTrigger asChild>
+							<Button className="rounded-lg shadow-sm">
+								<PlusIcon data-icon="inline-start" />
+								{m.project_create()}
+							</Button>
+						</DialogTrigger>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>{m.project_create()}</DialogTitle>
+								<DialogDescription>{workspace.data.name}</DialogDescription>
+							</DialogHeader>
+							<form onSubmit={submit}>
+								<FieldGroup>
+									<Field data-invalid={Boolean(actionError) || undefined}>
+										<FieldLabel htmlFor="project-name">
+											{m.project_name()}
+										</FieldLabel>
+										<Input
+											id="project-name"
+											name="name"
+											required
+											maxLength={120}
+										/>
+									</Field>
+									<Field>
+										<FieldLabel htmlFor="project-description">
+											{m.project_description()}
+										</FieldLabel>
+										<Textarea
+											id="project-description"
+											name="description"
+											maxLength={2000}
+										/>
+									</Field>
+									{actionError ? <FieldError>{actionError}</FieldError> : null}
+									<Button disabled={create.isPending} type="submit">
+										{m.project_create_submit()}
+									</Button>
+								</FieldGroup>
+							</form>
+						</DialogContent>
+					</Dialog>
+				) : null}
 			</div>
 			{actionError ? (
 				<p className="text-sm text-destructive" role="alert">
@@ -201,14 +199,16 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 								{m.workspace_onboarding_description()}
 							</CardDescription>
 						</div>
-						<Button
-							variant="outline"
-							className="rounded-lg"
-							onClick={() => setOpen(true)}
-						>
-							<PlusIcon data-icon="inline-start" />
-							{m.project_create()}
-						</Button>
+						{can("projects.create") ? (
+							<Button
+								variant="outline"
+								className="rounded-lg"
+								onClick={() => setOpen(true)}
+							>
+								<PlusIcon data-icon="inline-start" />
+								{m.project_create()}
+							</Button>
+						) : null}
 					</CardContent>
 				</Card>
 			) : (
@@ -267,8 +267,7 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 										{project.taskCount} {m.tasks()}
 									</span>
 
-									{members.data?.find((member) => member.id === user._id)
-										?.role === "owner" ? (
+									{can("projects.archive") ? (
 										<Button
 											size="sm"
 											variant="ghost"

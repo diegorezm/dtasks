@@ -16,6 +16,9 @@ type TaskBoardColumnProps = {
 	tasks: Task[];
 	members: WorkspaceMember[];
 	archived: boolean;
+	canCreate: boolean;
+	canMove: boolean;
+	canDelete: boolean;
 	isDropTarget: boolean;
 	draggedTaskId?: string;
 	isRemoving: boolean;
@@ -33,6 +36,9 @@ export function TaskBoardColumn({
 	tasks,
 	members,
 	archived,
+	canCreate,
+	canMove,
+	canDelete,
 	isDropTarget,
 	draggedTaskId,
 	isRemoving,
@@ -51,9 +57,9 @@ export function TaskBoardColumn({
 				"relative flex min-h-[32rem] flex-col rounded-xl border bg-muted/45 p-2 transition-[transform,background-color,border-color] duration-200",
 				isDropTarget && "-translate-y-0.5 border-primary/60 bg-primary/10",
 			)}
-			onDragEnter={(event) => onDragEnter(event, status)}
-			onDragOver={onDragOver}
-			onDrop={(event) => onDrop(event, status)}
+			onDragEnter={(event) => canMove && onDragEnter(event, status)}
+			onDragOver={(event) => canMove && onDragOver(event)}
+			onDrop={(event) => canMove && onDrop(event, status)}
 		>
 			<header className="flex items-center justify-between gap-3 px-2 pb-3 pt-1.5">
 				<div className="flex min-w-0 items-center gap-2">
@@ -69,7 +75,7 @@ export function TaskBoardColumn({
 					<span className="font-mono text-[11px] tabular-nums text-muted-foreground">
 						{tasks.length}
 					</span>
-					{!archived ? (
+					{!archived && canCreate ? (
 						<Button
 							type="button"
 							variant="ghost"
@@ -89,6 +95,8 @@ export function TaskBoardColumn({
 						task={task}
 						members={members}
 						archived={archived}
+						canMove={canMove}
+						canDelete={canDelete}
 						isDragging={draggedTaskId === task._id}
 						isRemoving={isRemoving}
 						onDragStart={onDragStart}

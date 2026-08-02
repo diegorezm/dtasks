@@ -22,41 +22,49 @@ import {
 } from "#/components/ui/sidebar";
 import { routeParamId } from "#/core/convex/id";
 import { DashboardSidebar } from "#/features/dashboard/components/dashboard-sidebar";
+import {
+	type WorkspaceAccess,
+	WorkspaceAccessProvider,
+} from "#/features/workspaces/workspace-access";
 import { m } from "#/paraglide/messages";
 import { api } from "../../convex/_generated/api";
 
 export function DashboardLayout({
+	access,
 	user,
 	workspaceId,
 	workspaceName,
 	children,
 }: {
+	access: WorkspaceAccess;
 	user: { name?: string | null; email: string; image?: string | null };
 	workspaceId: string;
 	workspaceName?: string;
 	children?: ReactNode;
 }) {
 	return (
-		<SidebarProvider>
-			<DashboardSidebar
-				user={user}
-				workspaceId={workspaceId}
-				workspaceName={workspaceName}
-			/>
-			<SidebarInset>
-				<header className="flex h-16 items-center gap-3 border-b px-4">
-					<SidebarTrigger />
-					<Separator orientation="vertical" className="h-4" />
-					<DashboardBreadcrumbs
-						workspaceId={workspaceId}
-						workspaceName={workspaceName}
-					/>
-				</header>
-				<main className="mx-auto w-full max-w-[1500px] p-4 md:p-7">
-					{children ?? <Outlet />}
-				</main>
-			</SidebarInset>
-		</SidebarProvider>
+		<WorkspaceAccessProvider access={access}>
+			<SidebarProvider>
+				<DashboardSidebar
+					user={user}
+					workspaceId={workspaceId}
+					workspaceName={workspaceName}
+				/>
+				<SidebarInset>
+					<header className="flex h-16 items-center gap-3 border-b px-4">
+						<SidebarTrigger />
+						<Separator orientation="vertical" className="h-4" />
+						<DashboardBreadcrumbs
+							workspaceId={workspaceId}
+							workspaceName={workspaceName}
+						/>
+					</header>
+					<main className="mx-auto w-full max-w-[1500px] p-4 md:p-7">
+						{children ?? <Outlet />}
+					</main>
+				</SidebarInset>
+			</SidebarProvider>
+		</WorkspaceAccessProvider>
 	);
 }
 
@@ -73,6 +81,10 @@ function DashboardBreadcrumbs({
 		from: "/__private/dashboard/$workspaceId/projects/$projectId",
 		shouldThrow: false,
 	});
+	const membersMatch = useMatch({
+		from: "/__private/dashboard/$workspaceId/settings/members",
+		shouldThrow: false,
+	});
 
 	if (projectMatch) {
 		return (
@@ -84,7 +96,30 @@ function DashboardBreadcrumbs({
 		);
 	}
 
+	if (membersMatch) {
+		return <MembersBreadcrumbs workspaceName={workspaceName} />;
+	}
+
 	return <ProjectsBreadcrumbs workspaceName={workspaceName} />;
+}
+
+function MembersBreadcrumbs({ workspaceName }: { workspaceName?: string }) {
+	return (
+		<Breadcrumb
+			aria-label={m.workspace_members_title()}
+			className="min-w-0 flex-1 overflow-hidden"
+		>
+			<BreadcrumbList className="w-full flex-nowrap">
+				<WorkspaceBreadcrumbItem workspaceName={workspaceName} />
+				<BreadcrumbSeparator className="hidden sm:block" />
+				<BreadcrumbItem>
+					<BreadcrumbPage className="truncate">
+						{m.workspace_members_title()}
+					</BreadcrumbPage>
+				</BreadcrumbItem>
+			</BreadcrumbList>
+		</Breadcrumb>
+	);
 }
 
 function ProjectsBreadcrumbs({ workspaceName }: { workspaceName?: string }) {

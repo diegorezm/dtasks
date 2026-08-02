@@ -52,7 +52,6 @@ const primaryNavigation = [
 
 const secondaryNavigation = [
 	{ label: m.dashboard_nav_notifications, icon: BellIcon },
-	{ label: m.dashboard_nav_settings, icon: Settings2Icon },
 	{ label: m.dashboard_nav_help, icon: CircleHelpIcon },
 ];
 
@@ -83,6 +82,10 @@ export function DashboardSidebar({
 	});
 	const projectMatch = useMatch({
 		from: "/__private/dashboard/$workspaceId/projects/$projectId",
+		shouldThrow: false,
+	});
+	const membersMatch = useMatch({
+		from: "/__private/dashboard/$workspaceId/settings/members",
 		shouldThrow: false,
 	});
 	const [recentProjectIds, setRecentProjectIds] = useState<string[]>([]);
@@ -199,6 +202,22 @@ export function DashboardSidebar({
 					</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									asChild
+									isActive={Boolean(membersMatch)}
+									tooltip={m.dashboard_nav_settings()}
+									className="h-9 rounded-lg px-3 text-sidebar-foreground/60 hover:text-sidebar-accent-foreground"
+								>
+									<Link
+										to="/dashboard/$workspaceId/settings/members"
+										params={{ workspaceId }}
+									>
+										<Settings2Icon />
+										<span>{m.dashboard_nav_settings()}</span>
+									</Link>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
 							{secondaryNavigation.map((item) => (
 								<SidebarMenuItem key={item.label()}>
 									<SidebarMenuButton

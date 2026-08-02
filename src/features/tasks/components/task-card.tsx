@@ -24,6 +24,8 @@ type TaskCardProps = {
 	task: Task;
 	members: WorkspaceMember[];
 	archived: boolean;
+	canMove: boolean;
+	canDelete: boolean;
 	isDragging: boolean;
 	isRemoving: boolean;
 	onDragStart: (event: DragEvent<HTMLElement>, taskId: string) => void;
@@ -35,6 +37,8 @@ export function TaskCard({
 	task,
 	members,
 	archived,
+	canMove,
+	canDelete,
 	isDragging,
 	isRemoving,
 	onDragStart,
@@ -47,14 +51,14 @@ export function TaskCard({
 	return (
 		<article
 			aria-label={task.title}
-			draggable={!archived}
+			draggable={!archived && canMove}
 			onDragEnd={onDragEnd}
 			onDragStart={(event) => onDragStart(event, task._id)}
 			className={cn(
 				"group relative rounded-md border border-border/80 border-l-2 bg-card px-3.5 py-3 transition-[transform,border-color,opacity] duration-200 hover:-translate-y-px hover:border-foreground/20",
 				priorityRails[task.priority],
 				isDragging && "scale-[0.98] opacity-45",
-				!archived && "cursor-grab active:cursor-grabbing",
+				!archived && canMove && "cursor-grab active:cursor-grabbing",
 			)}
 		>
 			<div className="flex flex-col gap-2.5">
@@ -93,16 +97,18 @@ export function TaskCard({
 						</span>
 					) : null}
 				</div>
-				<Button
-					aria-label={m.task_delete()}
-					size="icon-xs"
-					variant="ghost"
-					className="absolute right-2 top-2 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100 group-focus-within:opacity-100"
-					disabled={archived || isRemoving}
-					onClick={() => onRemove(task._id)}
-				>
-					<Trash2Icon />
-				</Button>
+				{canDelete ? (
+					<Button
+						aria-label={m.task_delete()}
+						size="icon-xs"
+						variant="ghost"
+						className="absolute right-2 top-2 opacity-0 transition-opacity hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100 group-focus-within:opacity-100"
+						disabled={archived || isRemoving}
+						onClick={() => onRemove(task._id)}
+					>
+						<Trash2Icon />
+					</Button>
+				) : null}
 			</div>
 		</article>
 	);

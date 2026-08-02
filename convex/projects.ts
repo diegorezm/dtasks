@@ -6,7 +6,6 @@ import {
 	optionalText,
 	requirePermission,
 	requireProjectAccess,
-	requireWorkspaceMember,
 } from "./lib/authorization";
 
 export const list = query({
@@ -15,7 +14,7 @@ export const list = query({
 		includeArchived: v.optional(v.boolean()),
 	},
 	handler: async (ctx, args) => {
-		await requireWorkspaceMember(ctx, args.workspaceId);
+		await requirePermission(ctx, args.workspaceId, "projects.view");
 		const statuses = args.includeArchived
 			? (["active", "archived"] as const)
 			: (["active"] as const);
@@ -56,6 +55,7 @@ export const get = query({
 	handler: async (ctx, args) => {
 		const project = await requireProjectAccess(ctx, args.projectId);
 		if (project.workspaceId !== args.workspaceId) fail("NOT_FOUND");
+		await requirePermission(ctx, project.workspaceId, "projects.view");
 		return project;
 	},
 });
@@ -69,7 +69,7 @@ export const create = mutation({
 		const { user } = await requirePermission(
 			ctx,
 			args.workspaceId,
-			"manageProjects",
+			"projects.create",
 		);
 		return ctx.db.insert("projects", {
 			workspaceId: args.workspaceId,
@@ -90,7 +90,7 @@ export const update = mutation({
 	handler: async (ctx, args) => {
 		const project = await requireProjectAccess(ctx, args.projectId);
 		if (project.status === "archived") fail("CONFLICT");
-		await requirePermission(ctx, project.workspaceId, "manageProjects");
+		await requirePermission(ctx, project.workspaceId, "projects.update");
 		await ctx.db.patch(args.projectId, {
 			name: normalizeText(args.name, 1, 120),
 			description: optionalText(args.description, 2000),
@@ -102,7 +102,7 @@ export const archive = mutation({
 	args: { projectId: v.id("projects") },
 	handler: async (ctx, args) => {
 		const project = await requireProjectAccess(ctx, args.projectId);
-		await requirePermission(ctx, project.workspaceId, "archiveProjects");
+		await requirePermission(ctx, project.workspaceId, "projects.archive");
 		if (project.status === "archived") fail("CONFLICT");
 		await ctx.db.patch(args.projectId, {
 			status: "archived",

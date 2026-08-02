@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Skeleton } from "#/components/ui/skeleton";
 import { routeParamId } from "#/core/convex/id";
 import { rememberRecentProject } from "#/core/project-preferences";
+import { useWorkspaceAccess } from "#/features/workspaces/workspace-access";
 import { m } from "#/paraglide/messages";
 import { api } from "../../../../convex/_generated/api";
 import { CreateTaskDialog } from "../components/create-task-dialog";
@@ -31,6 +32,7 @@ export function TaskBoardPage({
 	projectId: string;
 }) {
 	const context = useRouteContext({ from: "__root__" });
+	const { can } = useWorkspaceAccess();
 	const project = useQuery(
 		context.convexQueryClient.queryOptions(api.projects.get, {
 			workspaceId: routeParamId<"workspaces">(workspaceId),
@@ -161,6 +163,12 @@ export function TaskBoardPage({
 
 	const archived = project.data.status === "archived";
 	const taskList = tasks.data ?? [];
+	const contributorMembers = (members.data ?? []).filter(
+		(member) => member.canBeAssigned,
+	);
+	const canCreateTasks = can("tasks.create");
+	const canMoveTasks = can("tasks.move");
+	const canDeleteTasks = can("tasks.delete");
 	const completed = taskList.filter((task) => task.status === "done").length;
 	const progress = taskList.length
 		? Math.round((completed / taskList.length) * 100)
@@ -191,14 +199,18 @@ export function TaskBoardPage({
 				completed={completed}
 				total={taskList.length}
 			>
-				<CreateTaskTrigger onClick={() => openTaskCreate("backlog")} />
+				{canCreateTasks ? (
+					<CreateTaskTrigger onClick={() => openTaskCreate("backlog")} />
+				) : null}
 			</TaskBoardHeader>
-			<CreateTaskDialog
-				members={members.data ?? []}
-				isPending={create.isPending}
-				error={actionError}
-				onSubmit={createTask}
-			/>
+			{canCreateTasks ? (
+				<CreateTaskDialog
+					members={contributorMembers}
+					isPending={create.isPending}
+					error={actionError}
+					onSubmit={createTask}
+				/>
+			) : null}
 
 			{actionError ? (
 				<p
@@ -255,23 +267,27 @@ export function TaskBoardPage({
 										)}
 										members={members.data ?? []}
 										archived={archived}
+										canCreate={canCreateTasks}
+										canMove={canMoveTasks}
+										canDelete={canDeleteTasks}
 										isDropTarget={
 											overStatus === status && draggedTaskId !== undefined
 										}
 										draggedTaskId={draggedTaskId}
 										isRemoving={remove.isPending}
 										onDragEnter={(event, laneStatus) => {
-											if (!archived && draggedTaskId) {
+											if (!archived && canMoveTasks && draggedTaskId) {
 												event.preventDefault();
 												setOverStatus(laneStatus);
 											}
 										}}
 										onDragOver={(event) => {
-											if (!archived && draggedTaskId) event.preventDefault();
+											if (!archived && canMoveTasks && draggedTaskId)
+												event.preventDefault();
 										}}
 										onDrop={(event, laneStatus) => {
 											event.preventDefault();
-											if (!archived) handleDrop(laneStatus);
+											if (!archived && canMoveTasks) handleDrop(laneStatus);
 										}}
 										onDragStart={handleDragStart}
 										onDragEnd={() => {
@@ -296,6 +312,8 @@ export function TaskBoardPage({
 						members={members.data ?? []}
 						visibleStatuses={visibleStatuses}
 						archived={archived}
+						canMove={canMoveTasks}
+						canDelete={canDeleteTasks}
 						isMoving={move.isPending}
 						isRemoving={remove.isPending}
 						onMove={(taskId, status) =>

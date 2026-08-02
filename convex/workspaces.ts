@@ -5,8 +5,8 @@ import {
 	normalizeText,
 	requireAuthUser,
 	requirePermission,
-	requireWorkspaceMember,
 } from "./lib/authorization";
+import { hasPermission, permissionsByRole } from "./lib/permissions";
 
 export const listMine = query({
 	args: {},
@@ -28,15 +28,32 @@ export const listMine = query({
 export const get = query({
 	args: { workspaceId: v.id("workspaces") },
 	handler: async (ctx, args) => {
-		await requireWorkspaceMember(ctx, args.workspaceId);
+		await requirePermission(ctx, args.workspaceId, "workspace.view");
 		return ctx.db.get(args.workspaceId);
+	},
+});
+
+export const getMyAccess = query({
+	args: { workspaceId: v.id("workspaces") },
+	handler: async (ctx, args) => {
+		const { user, membership } = await requirePermission(
+			ctx,
+			args.workspaceId,
+			"workspace.view",
+		);
+		return {
+			userId: user._id,
+			membershipId: membership._id,
+			role: membership.role,
+			permissions: permissionsByRole[membership.role],
+		};
 	},
 });
 
 export const listMembers = query({
 	args: { workspaceId: v.id("workspaces") },
 	handler: async (ctx, args) => {
-		await requireWorkspaceMember(ctx, args.workspaceId);
+		await requirePermission(ctx, args.workspaceId, "members.view");
 		const members = await ctx.db
 			.query("workspaceMembers")
 			.withIndex("by_workspace_user", (q) =>
@@ -47,11 +64,13 @@ export const listMembers = query({
 			members.map(async (member) => {
 				const user = await authComponent.getAnyUserById(ctx, member.userId);
 				return {
+					membershipId: member._id,
 					id: member.userId,
 					name: user?.name ?? null,
 					email: user?.email ?? null,
 					image: user?.image ?? null,
 					role: member.role,
+					canBeAssigned: hasPermission(member.role, "tasks.update"),
 				};
 			}),
 		);
@@ -79,7 +98,7 @@ export const create = mutation({
 export const update = mutation({
 	args: { workspaceId: v.id("workspaces"), name: v.string() },
 	handler: async (ctx, args) => {
-		await requirePermission(ctx, args.workspaceId, "updateWorkspace");
+		await requirePermission(ctx, args.workspaceId, "workspace.update");
 		await ctx.db.patch(args.workspaceId, {
 			name: normalizeText(args.name, 1, 80),
 			updatedAt: Date.now(),

@@ -49,6 +49,20 @@ Feature work:
 
 Focused changes: modify existing ownership area. Do not create feature directories or abstractions without clear need.
 
+## Authorization And Permissions
+
+Every new feature must explicitly define and implement its authorization model before it is considered complete.
+
+- Identify the affected surface, actors, resource scope, and required permission keys during planning.
+- Add stable, action-specific permissions to the centralized permission model. Authorize permissions, not scattered role-name comparisons.
+- Enforce every protected query and mutation in Convex or the owning backend boundary. Route guards and hidden or disabled controls are UX only.
+- Validate the full resource chain, such as task → project → workspace → membership, and reject mismatched workspace, project, customer, or resource IDs.
+- Keep internal workspace access and customer portal access separate. Customer access must be project-scoped and use customer-safe data shapes.
+- Return derived capabilities to the frontend and use them to hide or disable unavailable actions. Never trust capabilities sent back by the client.
+- Preserve ownership and role-hierarchy invariants in backend mutations, including transfer, removal, invitation, and leave flows.
+- Add tests for allowed and denied roles, unauthenticated access, cross-workspace or cross-project access, and relevant ownership or customer-scoping invariants.
+- Include permission behavior and authorization verification in the feature handoff. Call out any skipped security tests as blockers or explicit follow-up work.
+
 ## Stack And Commands
 
 - TanStack Start and TanStack Router

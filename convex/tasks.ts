@@ -39,7 +39,7 @@ async function ensureAssignee(
 			q.eq("workspaceId", workspaceId).eq("userId", assigneeId),
 		)
 		.unique();
-	if (!member) fail("VALIDATION");
+	if (!member || member.role === "viewer") fail("VALIDATION");
 }
 async function nextPosition(
 	ctx: Context,
@@ -59,6 +59,7 @@ export const listByProject = query({
 	handler: async (ctx, args) => {
 		const project = await requireProjectAccess(ctx, args.projectId);
 		if (project.workspaceId !== args.workspaceId) fail("NOT_FOUND");
+		await requirePermission(ctx, project.workspaceId, "tasks.view");
 		return ctx.db
 			.query("tasks")
 			.withIndex("by_project_status_position", (q) =>
@@ -79,12 +80,13 @@ export const create = mutation({
 	},
 	handler: async (ctx, args) => {
 		const project = await requireProjectAccess(ctx, args.projectId);
-		await requirePermission(ctx, project.workspaceId, "manageTasks");
+		const { user } = await requirePermission(
+			ctx,
+			project.workspaceId,
+			"tasks.create",
+		);
 		if (project.status === "archived") fail("CONFLICT");
 		await ensureAssignee(ctx, project.workspaceId, args.assigneeId);
-		const user = (
-			await requirePermission(ctx, project.workspaceId, "manageTasks")
-		).user;
 		return ctx.db.insert("tasks", {
 			workspaceId: project.workspaceId,
 			projectId: args.projectId,
@@ -113,7 +115,7 @@ export const update = mutation({
 	},
 	handler: async (ctx, args) => {
 		const { task, project } = await requireTaskAccess(ctx, args.taskId);
-		await requirePermission(ctx, task.workspaceId, "manageTasks");
+		await requirePermission(ctx, task.workspaceId, "tasks.update");
 		if (project.status === "archived") fail("CONFLICT");
 		await ensureAssignee(ctx, task.workspaceId, args.assigneeId);
 		await ctx.db.patch(args.taskId, {
@@ -130,7 +132,7 @@ export const move = mutation({
 	args: { taskId: v.id("tasks"), status },
 	handler: async (ctx, args) => {
 		const { task, project } = await requireTaskAccess(ctx, args.taskId);
-		await requirePermission(ctx, task.workspaceId, "manageTasks");
+		await requirePermission(ctx, task.workspaceId, "tasks.move");
 		if (project.status === "archived") fail("CONFLICT");
 		await ctx.db.patch(args.taskId, {
 			status: args.status,
@@ -143,7 +145,7 @@ export const remove = mutation({
 	args: { taskId: v.id("tasks") },
 	handler: async (ctx, args) => {
 		const { task, project } = await requireTaskAccess(ctx, args.taskId);
-		await requirePermission(ctx, task.workspaceId, "manageTasks");
+		await requirePermission(ctx, task.workspaceId, "tasks.delete");
 		if (project.status === "archived") fail("CONFLICT");
 		await ctx.db.delete(args.taskId);
 	},

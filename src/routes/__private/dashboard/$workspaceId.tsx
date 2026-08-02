@@ -20,10 +20,16 @@ function WorkspaceLayout() {
 			workspaceId: routeParamId<"workspaces">(workspaceId),
 		}),
 	);
-	if (workspace.isLoading) return null;
-	if (!workspace.data) throw redirect({ to: "/dashboard" });
+	const access = useQuery(
+		convexQueryClient.queryOptions(api.workspaces.getMyAccess, {
+			workspaceId: routeParamId<"workspaces">(workspaceId),
+		}),
+	);
+	if (workspace.isLoading || access.isLoading) return null;
+	if (!workspace.data || !access.data) throw redirect({ to: "/dashboard" });
 	return (
 		<DashboardLayout
+			access={access.data}
 			user={user}
 			workspaceId={workspaceId}
 			workspaceName={workspace.data.name}

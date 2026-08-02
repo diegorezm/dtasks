@@ -2,19 +2,9 @@ import { ConvexError } from "convex/values";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { authComponent } from "../auth";
-
-export const permissions = {
-	view: ["owner", "member"],
-	manageProjects: ["owner", "member"],
-	archiveProjects: ["owner"],
-	manageTasks: ["owner", "member"],
-	manageInvitations: ["owner"],
-	updateWorkspace: ["owner"],
-} as const;
+import { hasPermission, type WorkspacePermission } from "./permissions";
 
 type Context = MutationCtx | QueryCtx;
-type Permission = keyof typeof permissions;
-
 export function fail(code: string): never {
 	throw new ConvexError({ code });
 }
@@ -43,11 +33,10 @@ export async function requireWorkspaceMember(
 export async function requirePermission(
 	ctx: Context,
 	workspaceId: Id<"workspaces">,
-	permission: Permission,
+	permission: WorkspacePermission,
 ) {
 	const result = await requireWorkspaceMember(ctx, workspaceId);
-	const allowedRoles: readonly string[] = permissions[permission];
-	if (!allowedRoles.includes(result.membership.role)) fail("FORBIDDEN");
+	if (!hasPermission(result.membership.role, permission)) fail("FORBIDDEN");
 	return result;
 }
 

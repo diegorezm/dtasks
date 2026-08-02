@@ -24,6 +24,8 @@ type TaskListViewProps = {
 	members: WorkspaceMember[];
 	visibleStatuses: TaskStatus[];
 	archived: boolean;
+	canMove: boolean;
+	canDelete: boolean;
 	isMoving: boolean;
 	isRemoving: boolean;
 	onMove: (taskId: Task["_id"], status: TaskStatus) => void;
@@ -35,6 +37,8 @@ export function TaskListView({
 	members,
 	visibleStatuses,
 	archived,
+	canMove,
+	canDelete,
 	isMoving,
 	isRemoving,
 	onMove,
@@ -80,6 +84,8 @@ export function TaskListView({
 											task={task}
 											members={members}
 											archived={archived}
+											canMove={canMove}
+											canDelete={canDelete}
 											isMoving={isMoving}
 											isRemoving={isRemoving}
 											onMove={onMove}
@@ -103,6 +109,8 @@ function TaskListRow({
 	task,
 	members,
 	archived,
+	canMove,
+	canDelete,
 	isMoving,
 	isRemoving,
 	onMove,
@@ -111,6 +119,8 @@ function TaskListRow({
 	task: Task;
 	members: WorkspaceMember[];
 	archived: boolean;
+	canMove: boolean;
+	canDelete: boolean;
 	isMoving: boolean;
 	isRemoving: boolean;
 	onMove: (taskId: Task["_id"], status: TaskStatus) => void;
@@ -159,38 +169,46 @@ function TaskListRow({
 					</Avatar>
 				) : null}
 			</div>
-			<div className="flex items-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-				<Button
-					aria-label={
-						previousStatus ? label(previousStatus) : label(task.status)
-					}
-					size="icon-sm"
-					variant="ghost"
-					disabled={archived || !previousStatus || isMoving}
-					onClick={() => previousStatus && onMove(task._id, previousStatus)}
-				>
-					<ChevronLeftIcon />
-				</Button>
-				<Button
-					aria-label={m.task_delete()}
-					size="icon-sm"
-					variant="ghost"
-					className="text-muted-foreground hover:text-destructive"
-					disabled={archived || isRemoving}
-					onClick={() => onRemove(task._id)}
-				>
-					<Trash2Icon />
-				</Button>
-				<Button
-					aria-label={nextStatus ? label(nextStatus) : label(task.status)}
-					size="icon-sm"
-					variant="ghost"
-					disabled={archived || !nextStatus || isMoving}
-					onClick={() => nextStatus && onMove(task._id, nextStatus)}
-				>
-					<ChevronRightIcon />
-				</Button>
-			</div>
+			{canMove || canDelete ? (
+				<div className="flex items-center opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+					{canMove ? (
+						<Button
+							aria-label={
+								previousStatus ? label(previousStatus) : label(task.status)
+							}
+							size="icon-sm"
+							variant="ghost"
+							disabled={archived || !previousStatus || isMoving}
+							onClick={() => previousStatus && onMove(task._id, previousStatus)}
+						>
+							<ChevronLeftIcon />
+						</Button>
+					) : null}
+					{canDelete ? (
+						<Button
+							aria-label={m.task_delete()}
+							size="icon-sm"
+							variant="ghost"
+							className="text-muted-foreground hover:text-destructive"
+							disabled={archived || isRemoving}
+							onClick={() => onRemove(task._id)}
+						>
+							<Trash2Icon />
+						</Button>
+					) : null}
+					{canMove ? (
+						<Button
+							aria-label={nextStatus ? label(nextStatus) : label(task.status)}
+							size="icon-sm"
+							variant="ghost"
+							disabled={archived || !nextStatus || isMoving}
+							onClick={() => nextStatus && onMove(task._id, nextStatus)}
+						>
+							<ChevronRightIcon />
+						</Button>
+					) : null}
+				</div>
+			) : null}
 		</article>
 	);
 }

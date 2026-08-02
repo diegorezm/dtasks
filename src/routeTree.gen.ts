@@ -22,6 +22,7 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as _privateDashboardWorkspaceIdIndexRouteImport } from './routes/__private/dashboard/$workspaceId/index'
 import { Route as _privateDashboardWorkspaceIdProjectsIndexRouteImport } from './routes/__private/dashboard/$workspaceId/projects/index'
 import { Route as _privateDashboardWorkspaceIdProjectsProjectIdRouteImport } from './routes/__private/dashboard/$workspaceId/projects/$projectId'
+import { Route as _privateDashboardWorkspaceIdSettingsMembersRouteImport } from './routes/__private/dashboard/$workspaceId/settings/members'
 
 const _privateRoute = _privateRouteImport.update({
   id: '/__private',
@@ -91,6 +92,12 @@ const _privateDashboardWorkspaceIdProjectsProjectIdRoute =
     path: '/projects/$projectId',
     getParentRoute: () => _privateDashboardWorkspaceIdRoute,
   } as any)
+const _privateDashboardWorkspaceIdSettingsMembersRoute =
+  _privateDashboardWorkspaceIdSettingsMembersRouteImport.update({
+    id: '/settings/members',
+    path: '/settings/members',
+    getParentRoute: () => _privateDashboardWorkspaceIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof _publicIndexRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof _privateDashboardIndexRoute
   '/dashboard/$workspaceId/': typeof _privateDashboardWorkspaceIdIndexRoute
   '/dashboard/$workspaceId/projects/$projectId': typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
+  '/dashboard/$workspaceId/settings/members': typeof _privateDashboardWorkspaceIdSettingsMembersRoute
   '/dashboard/$workspaceId/projects/': typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -115,6 +123,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof _privateDashboardIndexRoute
   '/dashboard/$workspaceId': typeof _privateDashboardWorkspaceIdIndexRoute
   '/dashboard/$workspaceId/projects/$projectId': typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
+  '/dashboard/$workspaceId/settings/members': typeof _privateDashboardWorkspaceIdSettingsMembersRoute
   '/dashboard/$workspaceId/projects': typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
 export interface FileRoutesById {
@@ -131,6 +140,7 @@ export interface FileRoutesById {
   '/__private/dashboard/': typeof _privateDashboardIndexRoute
   '/__private/dashboard/$workspaceId/': typeof _privateDashboardWorkspaceIdIndexRoute
   '/__private/dashboard/$workspaceId/projects/$projectId': typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
+  '/__private/dashboard/$workspaceId/settings/members': typeof _privateDashboardWorkspaceIdSettingsMembersRoute
   '/__private/dashboard/$workspaceId/projects/': typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
 export interface FileRouteTypes {
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/$workspaceId/'
     | '/dashboard/$workspaceId/projects/$projectId'
+    | '/dashboard/$workspaceId/settings/members'
     | '/dashboard/$workspaceId/projects/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/$workspaceId'
     | '/dashboard/$workspaceId/projects/$projectId'
+    | '/dashboard/$workspaceId/settings/members'
     | '/dashboard/$workspaceId/projects'
   id:
     | '__root__'
@@ -173,6 +185,7 @@ export interface FileRouteTypes {
     | '/__private/dashboard/'
     | '/__private/dashboard/$workspaceId/'
     | '/__private/dashboard/$workspaceId/projects/$projectId'
+    | '/__private/dashboard/$workspaceId/settings/members'
     | '/__private/dashboard/$workspaceId/projects/'
   fileRoutesById: FileRoutesById
 }
@@ -275,12 +288,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof _privateDashboardWorkspaceIdProjectsProjectIdRouteImport
       parentRoute: typeof _privateDashboardWorkspaceIdRoute
     }
+    '/__private/dashboard/$workspaceId/settings/members': {
+      id: '/__private/dashboard/$workspaceId/settings/members'
+      path: '/settings/members'
+      fullPath: '/dashboard/$workspaceId/settings/members'
+      preLoaderRoute: typeof _privateDashboardWorkspaceIdSettingsMembersRouteImport
+      parentRoute: typeof _privateDashboardWorkspaceIdRoute
+    }
   }
 }
 
 interface _privateDashboardWorkspaceIdRouteChildren {
   _privateDashboardWorkspaceIdIndexRoute: typeof _privateDashboardWorkspaceIdIndexRoute
   _privateDashboardWorkspaceIdProjectsProjectIdRoute: typeof _privateDashboardWorkspaceIdProjectsProjectIdRoute
+  _privateDashboardWorkspaceIdSettingsMembersRoute: typeof _privateDashboardWorkspaceIdSettingsMembersRoute
   _privateDashboardWorkspaceIdProjectsIndexRoute: typeof _privateDashboardWorkspaceIdProjectsIndexRoute
 }
 
@@ -290,6 +311,8 @@ const _privateDashboardWorkspaceIdRouteChildren: _privateDashboardWorkspaceIdRou
       _privateDashboardWorkspaceIdIndexRoute,
     _privateDashboardWorkspaceIdProjectsProjectIdRoute:
       _privateDashboardWorkspaceIdProjectsProjectIdRoute,
+    _privateDashboardWorkspaceIdSettingsMembersRoute:
+      _privateDashboardWorkspaceIdSettingsMembersRoute,
     _privateDashboardWorkspaceIdProjectsIndexRoute:
       _privateDashboardWorkspaceIdProjectsIndexRoute,
   }
