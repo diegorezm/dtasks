@@ -84,6 +84,7 @@ Keep Convex running during frontend data-access tests.
 ## React
 
 - Keep components small. Extract complex UI into focused components.
+- Treat a component with many local states, effects, handlers, and server concerns as a refactor signal. Tell the next agent or maintainer when you encounter one, and prefer extracting feature hooks or Zustand stores before adding more responsibility.
 - Avoid `useEffect`; use only for genuine external synchronization.
 - Compute derived values during render, not with `useEffect` and `useState`.
 - Keep business logic and data fetching in hooks or services, not components.
@@ -93,6 +94,8 @@ Keep Convex running during frontend data-access tests.
 - Avoid prop drilling beyond two or three levels. Use context or client-state store when needed.
 
 Use Zustand for complex client/UI state. Use React Query or SWR for server state. Do not put server state in Zustand.
+
+When multiple board-specific child components need the same client/UI state, they may read the feature-scoped Zustand hook directly. Keep workspace/project identifiers explicit so the store remains correctly scoped, and continue passing server-derived data as props.
 
 ## UI And Localization
 
