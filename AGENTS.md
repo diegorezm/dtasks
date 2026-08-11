@@ -2,12 +2,27 @@
 
 ## Product
 
-DTasks is B2B project-management platform with two surfaces:
+DTasks is a B2B project-management platform intended to have two surfaces:
 
-- Internal dashboard for company users.
-- Branded customer portal for invited customers.
+- **Internal dashboard:** implemented for company users, with workspace, project, task, member, and workspace-invitation flows.
+- **Branded customer portal:** planned, but not implemented in the current routes, schema, or data-access layer.
 
-Keep surfaces separate in routes, behavior, authorization, and data access. Scope customer data and actions to invited projects.
+Workspace invitations currently create internal workspace memberships. Do not treat them as customer-portal invitations or customer authorization.
+
+When implementing the customer portal, keep it separate from the internal dashboard in routes, behavior, authorization, and data access. Scope customer data and actions to explicitly invited projects, and do not expose internal data shapes.
+
+## Repository Map
+
+- `src/routes/`: TanStack Router framework boundary. Route files should remain thin and delegate to feature routes or views.
+- `src/features/`: frontend behavior and UI organized by domain feature.
+- `src/layouts/`: application-level page structure shared across features.
+- `src/core/`: shared providers, configuration, branding, validation, and utilities.
+- `src/components/ui/`: shared shadcn/ui primitives.
+- `convex/`: schema, backend queries and mutations, authorization, and permission enforcement.
+- `messages/`: editable Paraglide source messages. Current locales are `en` and `pt-BR`.
+- `src/paraglide/`, `src/routeTree.gen.ts`, and `convex/_generated/`: generated output; never edit these files manually.
+
+The usual frontend flow is `src/routes` → `src/features/<feature>/routes.tsx` or a feature view → Convex functions under `convex/`.
 
 ## Before Coding
 
@@ -115,7 +130,8 @@ When multiple board-specific child components need the same client/UI state, the
 
 - Use shadcn/ui and existing design conventions.
 - Localize every user-visible string through Paraglide.
-- Add or update messages in `src/paraglide/`; use generated messages in UI.
+- Add or update source messages in `messages/en.json` and `messages/pt-BR.json`.
+- Import generated message functions from `#/paraglide/messages` in application code. Never edit `src/paraglide/` directly.
 - Verify desktop and mobile behavior.
 - Preserve accessibility, loading, empty, error, and permission states.
 
