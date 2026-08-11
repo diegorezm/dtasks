@@ -10,26 +10,25 @@ import {
 } from "#/components/ui/dropdown-menu";
 import { ToggleGroup, ToggleGroupItem } from "#/components/ui/toggle-group";
 import { m } from "#/paraglide/messages";
+import { useTaskBoardPreferences } from "../hooks/use-task-board-preferences";
 import { columns, type TaskStatus } from "./task-board-types";
 
 export type TaskBoardView = "board" | "list";
 
 type TaskBoardViewControlsProps = {
-	view: TaskBoardView;
-	visibleStatuses: TaskStatus[];
-	onViewChange: (view: TaskBoardView) => void;
-	onVisibleStatusesChange: (statuses: TaskStatus[]) => void;
+	workspaceId: string;
+	projectId: string;
 };
 
 export function TaskBoardViewControls({
-	view,
-	visibleStatuses,
-	onViewChange,
-	onVisibleStatusesChange,
+	workspaceId,
+	projectId,
 }: TaskBoardViewControlsProps) {
+	const { view, visibleStatuses, setView, setVisibleStatuses } =
+		useTaskBoardPreferences(workspaceId, projectId);
 	function toggleStatus(status: TaskStatus, checked: boolean) {
 		if (checked) {
-			onVisibleStatusesChange(
+			setVisibleStatuses(
 				columns.filter(
 					(column): column is TaskStatus =>
 						column === status || visibleStatuses.includes(column),
@@ -39,9 +38,7 @@ export function TaskBoardViewControls({
 		}
 
 		if (visibleStatuses.length === 1) return;
-		onVisibleStatusesChange(
-			visibleStatuses.filter((column) => column !== status),
-		);
+		setVisibleStatuses(visibleStatuses.filter((column) => column !== status));
 	}
 
 	return (
@@ -51,7 +48,7 @@ export function TaskBoardViewControls({
 				type="single"
 				value={view}
 				onValueChange={(value) => {
-					if (value === "board" || value === "list") onViewChange(value);
+					if (value === "board" || value === "list") setView(value);
 				}}
 				variant="outline"
 				size="sm"

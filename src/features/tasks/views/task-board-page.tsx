@@ -17,11 +17,9 @@ import {
 	TaskBoardHeader,
 } from "../components/task-board-header";
 import { columns, type TaskStatus } from "../components/task-board-types";
-import {
-	type TaskBoardView,
-	TaskBoardViewControls,
-} from "../components/task-board-view-controls";
+import { TaskBoardViewControls } from "../components/task-board-view-controls";
 import { TaskListView } from "../components/task-list-view";
+import { useTaskBoardPreferences } from "../hooks/use-task-board-preferences";
 import { useTaskCreateStore } from "../hooks/use-task-create-store";
 
 export function TaskBoardPage({
@@ -65,46 +63,19 @@ export function TaskBoardPage({
 	const [actionError, setActionError] = useState<string>();
 	const [draggedTaskId, setDraggedTaskId] = useState<string>();
 	const [overStatus, setOverStatus] = useState<TaskStatus>();
-	const [query, setQuery] = useState("");
-	const [priorityFilter, setPriorityFilter] = useState("all");
-	const [assigneeFilter, setAssigneeFilter] = useState("all");
-	const [view, setView] = useState<TaskBoardView>("board");
-	const [visibleStatuses, setVisibleStatuses] = useState<TaskStatus[]>([
-		...columns,
-	]);
-	const [preferencesReady, setPreferencesReady] = useState(false);
+	const {
+		query,
+		priority: priorityFilter,
+		assignee: assigneeFilter,
+		view,
+		visibleStatuses,
+	} = useTaskBoardPreferences(workspaceId, projectId);
 	const createStatus = useTaskCreateStore((state) => state.status);
 	const openTaskCreate = useTaskCreateStore((state) => state.openForStatus);
-	const preferenceKey = `dtasks:task-view:${workspaceId}:${projectId}`;
 
 	useEffect(() => {
 		if (project.data) rememberRecentProject(workspaceId, projectId);
 	}, [project.data, projectId, workspaceId]);
-
-	useEffect(() => {
-		try {
-			const saved = localStorage.getItem(preferenceKey);
-			if (saved) {
-				const preferences: unknown = JSON.parse(saved);
-				if (isTaskViewPreferences(preferences)) {
-					setView(preferences.view);
-					setVisibleStatuses(preferences.visibleStatuses);
-				}
-			}
-		} catch {
-			// Preferences are optional and should never block the board.
-		} finally {
-			setPreferencesReady(true);
-		}
-	}, [preferenceKey]);
-
-	useEffect(() => {
-		if (!preferencesReady) return;
-		localStorage.setItem(
-			preferenceKey,
-			JSON.stringify({ view, visibleStatuses }),
-		);
-	}, [preferenceKey, preferencesReady, view, visibleStatuses]);
 
 	function createTask(form: FormData, close: () => void) {
 		create.mutate(
@@ -224,26 +195,15 @@ export function TaskBoardPage({
 			<div className="flex flex-col gap-3 lg:flex-row lg:items-center">
 				<TaskBoardFilters
 					className="min-w-0 flex-1 border-b-0 pb-0"
-					query={query}
-					priority={priorityFilter}
-					assignee={assigneeFilter}
+					workspaceId={workspaceId}
+					projectId={projectId}
 					members={members.data ?? []}
 					resultCount={filteredTasks.length}
 					totalCount={taskList.length}
-					onQueryChange={setQuery}
-					onPriorityChange={setPriorityFilter}
-					onAssigneeChange={setAssigneeFilter}
-					onClear={() => {
-						setQuery("");
-						setPriorityFilter("all");
-						setAssigneeFilter("all");
-					}}
 				/>
 				<TaskBoardViewControls
-					view={view}
-					visibleStatuses={visibleStatuses}
-					onViewChange={setView}
-					onVisibleStatusesChange={setVisibleStatuses}
+					workspaceId={workspaceId}
+					projectId={projectId}
 				/>
 			</div>
 
@@ -333,22 +293,6 @@ export function TaskBoardPage({
 				)}
 			</section>
 		</div>
-	);
-}
-
-function isTaskViewPreferences(value: unknown): value is {
-	view: TaskBoardView;
-	visibleStatuses: TaskStatus[];
-} {
-	if (!value || typeof value !== "object") return false;
-	const preferences = value as Record<string, unknown>;
-	return (
-		(preferences.view === "board" || preferences.view === "list") &&
-		Array.isArray(preferences.visibleStatuses) &&
-		preferences.visibleStatuses.length > 0 &&
-		preferences.visibleStatuses.every((status) =>
-			columns.includes(status as (typeof columns)[number]),
-		)
 	);
 }
 

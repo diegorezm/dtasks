@@ -11,35 +11,35 @@ import {
 } from "#/components/ui/select";
 import { cn } from "#/lib/utils";
 import { m } from "#/paraglide/messages";
+import { useTaskBoardPreferences } from "../hooks/use-task-board-preferences";
 import type { WorkspaceMember } from "./task-board-types";
 
 type TaskBoardFiltersProps = {
-	query: string;
-	priority: string;
-	assignee: string;
+	workspaceId: string;
+	projectId: string;
 	members: WorkspaceMember[];
 	resultCount: number;
 	totalCount: number;
-	onQueryChange: (value: string) => void;
-	onPriorityChange: (value: string) => void;
-	onAssigneeChange: (value: string) => void;
-	onClear: () => void;
 	className?: string;
 };
 
 export function TaskBoardFilters({
-	query,
-	priority,
-	assignee,
+	workspaceId,
+	projectId,
 	members,
 	resultCount,
 	totalCount,
-	onQueryChange,
-	onPriorityChange,
-	onAssigneeChange,
-	onClear,
 	className,
 }: TaskBoardFiltersProps) {
+	const {
+		query,
+		priority,
+		assignee,
+		setQuery,
+		setPriority,
+		setAssignee,
+		clearFilters,
+	} = useTaskBoardPreferences(workspaceId, projectId);
 	const hasFilters =
 		query.length > 0 || priority !== "all" || assignee !== "all";
 
@@ -59,14 +59,14 @@ export function TaskBoardFilters({
 				<Input
 					type="search"
 					value={query}
-					onChange={(event) => onQueryChange(event.target.value)}
+					onChange={(event) => setQuery(event.target.value)}
 					placeholder={m.task_search_placeholder()}
 					aria-label={m.task_search_placeholder()}
 					className="h-9 border-transparent bg-muted/60 pl-9 shadow-none focus-visible:border-ring"
 				/>
 			</div>
 			<div className="grid grid-cols-2 gap-2 sm:flex">
-				<Select value={priority} onValueChange={onPriorityChange}>
+				<Select value={priority} onValueChange={setPriority}>
 					<SelectTrigger className="h-9 w-full border-transparent bg-muted/60 shadow-none sm:w-40">
 						<SelectValue placeholder={m.task_priority()} />
 					</SelectTrigger>
@@ -80,7 +80,7 @@ export function TaskBoardFilters({
 						</SelectGroup>
 					</SelectContent>
 				</Select>
-				<Select value={assignee} onValueChange={onAssigneeChange}>
+				<Select value={assignee} onValueChange={setAssignee}>
 					<SelectTrigger className="h-9 w-full border-transparent bg-muted/60 shadow-none sm:w-44">
 						<SelectValue placeholder={m.task_assignee()} />
 					</SelectTrigger>
@@ -109,7 +109,7 @@ export function TaskBoardFilters({
 						variant="ghost"
 						size="sm"
 						className="text-muted-foreground"
-						onClick={onClear}
+						onClick={clearFilters}
 					>
 						<XIcon data-icon="inline-start" />
 						{m.task_clear_filters()}
