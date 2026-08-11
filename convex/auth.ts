@@ -7,27 +7,33 @@ import { query } from "./_generated/server";
 import authConfig from "./auth.config";
 
 const siteUrl = process.env.SITE_URL;
+const secret = process.env.BETTER_AUTH_SECRET;
+
+if (!secret) {
+    throw new Error("Missing BETTER_AUTH_SECRET environment variable");
+}
 
 if (!siteUrl) {
-	throw new Error("Missing SITE_URL environment variable");
+    throw new Error("Missing SITE_URL environment variable");
 }
 
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
 export function createAuth(ctx: GenericCtx<DataModel>) {
-	return betterAuth({
-		appName: "DTasks",
-		baseURL: siteUrl,
-		database: authComponent.adapter(ctx),
-		emailAndPassword: {
-			enabled: true,
-			requireEmailVerification: false,
-		},
-		plugins: [convex({ authConfig })],
-	});
+    return betterAuth({
+        appName: "DTasks",
+        baseURL: siteUrl,
+        database: authComponent.adapter(ctx),
+        secret: secret,
+        emailAndPassword: {
+            enabled: true,
+            requireEmailVerification: false,
+        },
+        plugins: [convex({ authConfig })],
+    });
 }
 
 export const getCurrentUser = query({
-	args: {},
-	handler: async (ctx) => authComponent.safeGetAuthUser(ctx),
+    args: {},
+    handler: async (ctx) => authComponent.safeGetAuthUser(ctx),
 });
