@@ -90,7 +90,7 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 	}
 	if (projects.isLoading || workspace.isLoading)
 		return (
-			<div className="flex flex-col gap-8">
+			<div className="projects-page flex flex-col gap-8">
 				<div className="space-y-3">
 					<Skeleton className="h-3 w-28" />
 					<Skeleton className="h-12 w-64" />
@@ -105,8 +105,8 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 	if (projects.error || !workspace.data) return <p>{m.error_generic()}</p>;
 	const projectList = projects.data ?? [];
 	return (
-		<div className="flex flex-col gap-8">
-			<div className="flex flex-wrap items-end justify-between gap-5 border-b border-border/70 pb-7">
+		<div className="projects-page flex flex-col gap-8">
+			<div className="projects-header flex flex-wrap items-end justify-between gap-5 border-b border-border/70 pb-7">
 				<div className="space-y-3">
 					<div className="flex items-center gap-2 text-primary">
 						<FolderKanbanIcon className="size-4" aria-hidden="true" />
@@ -181,7 +181,7 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 				</p>
 			) : null}
 			{projectList.length === 0 ? (
-				<Card className="overflow-hidden rounded-xl border-dashed bg-card/70 shadow-none">
+				<Card className="projects-empty overflow-hidden rounded-xl border-dashed bg-card/70 shadow-none">
 					<CardContent className="grid gap-8 p-7 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:p-10">
 						<div className="relative flex size-20 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
 							<div className="absolute inset-3 rounded-lg border border-primary/25" />
@@ -212,13 +212,13 @@ export function ProjectsPage({ workspaceId }: { workspaceId: string }) {
 					</CardContent>
 				</Card>
 			) : (
-				<div className="overflow-hidden border-y border-border/70">
+				<div className="projects-list overflow-hidden border-y border-border/70">
 					{projectList.map((project, index) => {
 						const accent = projectAccents[index % projectAccents.length];
 						return (
 							<article
 								key={project._id}
-								className="group relative grid gap-5 px-2 py-5 transition-colors before:absolute before:inset-y-4 before:left-0 before:w-0.5 before:rounded-full before:bg-transparent hover:bg-primary/5 hover:before:bg-primary md:grid-cols-[3.5rem_minmax(0,1.35fr)_minmax(12rem,0.8fr)_auto] md:items-center md:px-4"
+								className="project-row group relative grid gap-5 px-2 py-5 transition-colors before:absolute before:inset-y-4 before:left-0 before:w-0.5 before:rounded-full before:bg-transparent hover:bg-primary/5 hover:before:bg-primary md:grid-cols-[3.5rem_minmax(0,1.35fr)_minmax(12rem,0.8fr)_auto] md:items-center md:px-4"
 							>
 								<div
 									className={`flex size-11 shrink-0 items-center justify-center rounded-full ${accent.tint} ${accent.text}`}
